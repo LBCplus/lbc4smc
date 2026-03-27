@@ -1,6 +1,5 @@
 {
-  "buildCommand": "",
-  "outputDirectory": ".",
+  "framework": "vite",
   "cleanUrls": true,
   "trailingSlash": false,
   "headers": [
