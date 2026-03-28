@@ -692,8 +692,8 @@ export default function App() {
         .site-nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(250,247,242,0.92);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid rgba(45,62,54,0.06);transition:box-shadow 0.3s}
         .nav-scrolled{box-shadow:0 1px 12px rgba(0,0,0,0.06)}
         .nav-inner{max-width:1200px;margin:0 auto;padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:64px}
-        .nav-brand{font-family:'DM Serif Display',serif;font-size:18px;color:#003A75;text-decoration:none;letter-spacing:-0.02em}
-        .nav-badge{color:#F7CF3D;margin-left:6px;font-size:11px;font-family:'Source Sans 3',sans-serif;font-weight:600;letter-spacing:0.06em;text-transform:uppercase}
+        .nav-brand{font-family:'DM Serif Display',serif;font-size:22px;color:#003A75;text-decoration:none;letter-spacing:-0.02em;text-shadow:0.5px 0.5px 0 #F7CF3D,-0.5px -0.5px 0 #F7CF3D}
+        .nav-badge{color:#F7CF3D;margin-left:8px;font-size:22px;font-family:'DM Serif Display',serif;font-weight:400;letter-spacing:-0.02em;text-transform:none;text-shadow:0.5px 0.5px 0 #003A75,-0.5px -0.5px 0 #003A75}
         .nav-links{display:flex;gap:28px;align-items:center}
         .nav-link{font-family:'Source Sans 3',sans-serif;font-size:12px;font-weight:500;color:#646469;text-decoration:none;text-transform:uppercase;letter-spacing:0.09em;transition:all 0.2s;padding-bottom:3px;border-bottom:2px solid transparent}
         .nav-link:hover{color:#003A75;opacity:1!important}
