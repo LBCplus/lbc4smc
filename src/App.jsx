@@ -182,7 +182,7 @@ function Story() {
                   opacity: vis ? 1 : 0, transition: "opacity 0.8s ease 0.3s"
                 }}>
                   <img src="/images/family-latin-america.jpeg" alt="Family in Latin America, before the journey" className="story-photo" />
-                  <img src="/images/childhood-with-mother.jpeg" alt="With mother in early California days" className="story-photo" />
+                  <img src="/images/young-lbc-california.jpeg" alt="Young Luis in California" className="story-photo" />
                 </div>
               )}
               {i === 1 && (
@@ -206,7 +206,7 @@ function Story() {
                 <div className="story-photos story-photos-single" style={{
                   opacity: vis ? 1 : 0, transition: "opacity 0.8s ease 0.55s"
                 }}>
-                  <img src="/images/lincoln-memorial-berkeley.jpeg" alt="At the Lincoln Memorial wearing a Berkeley shirt" className="story-photo story-photo-tall" />
+                  <img src="/images/berkeley-oski.jpeg" alt="With Oski the Bear at UC Berkeley" className="story-photo" />
                 </div>
               )}
               {i === 4 && (
