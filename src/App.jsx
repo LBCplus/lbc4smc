@@ -84,10 +84,10 @@ function SectionLabel({ children, light }) {
   return (
     <div style={{
       fontFamily: "'Source Sans 3', sans-serif", fontSize: 12, fontWeight: 600,
-      color: "#B8860B", letterSpacing: "0.16em", textTransform: "uppercase",
+      color: "#F7CF3D", letterSpacing: "0.16em", textTransform: "uppercase",
       marginBottom: 16, display: "flex", alignItems: "center", gap: 12
     }}>
-      <span style={{ width: 28, height: 1.5, background: "#B8860B", display: "inline-block", borderRadius: 1 }} />
+      <span style={{ width: 28, height: 1.5, background: "#F7CF3D", display: "inline-block", borderRadius: 1 }} />
       {children}
     </div>
   );
@@ -107,7 +107,7 @@ function Hero() {
             <SectionLabel>Santa Monica College Board of Trustees · November 2026</SectionLabel>
             <h1 className="hero-heading">
               Transparency isn't<br />a campaign promise.<br />
-              <span style={{ color: "#B8860B" }}>It's a technology.</span>
+              <span style={{ color: "#F7CF3D" }}>It's a technology.</span>
             </h1>
             <p className="hero-sub">
               Twenty-five years ago, I walked along Pico Boulevard as an undocumented teenager 
@@ -217,6 +217,14 @@ function Story() {
                   <img src="/images/doctorate-graduation.jpeg" alt="Ed.D. graduation from Cal State Northridge" className="story-photo story-photo-tall" />
                 </div>
               )}
+              {i === 5 && (
+                <div className="story-photos" style={{
+                  opacity: vis ? 1 : 0, transition: "opacity 0.8s ease 0.7s"
+                }}>
+                  <img src="/images/smc-podium-2025.jpeg" alt="Speaking at Santa Monica College, 2025" className="story-photo story-photo-tall" />
+                  <img src="/images/board-appointment-2025.jpeg" alt="Board of Trustees appointment ceremony, February 2025" className="story-photo story-photo-tall" />
+                </div>
+              )}
             </div>
           ))}
         </div>
@@ -244,7 +252,7 @@ function Priorities() {
   ];
 
   return (
-    <section id="priorities" style={{ background: "#2D3E36", padding: "100px 24px" }}>
+    <section id="priorities" style={{ background: "#003A75", padding: "100px 24px" }}>
       <div ref={ref} style={{ maxWidth: 940, margin: "0 auto" }}>
         <SectionLabel light>Platform</SectionLabel>
         <h2 className="section-heading light">Priorities backed by data,<br />not just promises.</h2>
@@ -375,7 +383,7 @@ function Community() {
   ];
 
   return (
-    <section id="community" style={{ background: "#F4EFE5", padding: "100px 24px" }}>
+    <section id="community" style={{ background: "#F0F4F8", padding: "100px 24px" }}>
       <div ref={ref} style={{ maxWidth: 940, margin: "0 auto" }}>
         <SectionLabel>Community</SectionLabel>
         <h2 className="section-heading dark">Rooted in Santa Monica.</h2>
@@ -433,7 +441,7 @@ function Community() {
         <div className="education-card">
           <div className="education-label">Education</div>
           <div className="education-list">
-            Ed.D., California State University, Northridge — <em style={{ color: "#6B7C74" }}>Career Pathway Partnerships</em><br />
+            Ed.D., California State University, Northridge — <em style={{ color: "#646469" }}>Career Pathway Partnerships</em><br />
             M.P.A., California State University, Northridge<br />
             B.A., University of California, Berkeley<br />
             A.A., Santa Monica College
@@ -465,12 +473,12 @@ function Espanol() {
   ];
 
   return (
-    <section id="español" style={{ background: "#2D3E36", padding: "100px 24px" }}>
+    <section id="español" style={{ background: "#003A75", padding: "100px 24px" }}>
       <div style={{ maxWidth: 800, margin: "0 auto" }}>
         <SectionLabel>Para Nuestra Comunidad</SectionLabel>
         <h2 className="section-heading light" style={{ margin: "0 0 16px" }}>
           La transparencia no es<br />una promesa de campaña.<br />
-          <span style={{ color: "#B8860B" }}>Es una tecnología.</span>
+          <span style={{ color: "#F7CF3D" }}>Es una tecnología.</span>
         </h2>
 
         <div style={{ margin: "24px 0 32px", textAlign: "center" }}>
@@ -493,7 +501,7 @@ function Espanol() {
         {/* Mi Historia */}
         <div style={{
           padding: "28px 32px", background: "rgba(250, 247, 242, 0.04)",
-          borderRadius: 8, borderLeft: "3px solid #B8860B", marginBottom: 40
+          borderRadius: 8, borderLeft: "3px solid #F7CF3D", marginBottom: 40
         }}>
           <h3 style={{
             fontFamily: "'DM Serif Display', serif", fontSize: 22,
@@ -550,7 +558,7 @@ function Espanol() {
         {/* CivicLens */}
         <div style={{
           padding: "28px 32px", background: "rgba(250, 247, 242, 0.04)",
-          borderRadius: 8, borderLeft: "3px solid #B8860B", marginBottom: 40
+          borderRadius: 8, borderLeft: "3px solid #F7CF3D", marginBottom: 40
         }}>
           <h3 style={{
             fontFamily: "'DM Serif Display', serif", fontSize: 22,
@@ -587,7 +595,7 @@ function Espanol() {
             Nuestra comunidad merece información en su idioma — no como un gesto simbólico, 
             sino como un derecho.
           </p>
-          <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: 24, color: "#B8860B" }}>
+          <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: 24, color: "#F7CF3D" }}>
             ¡Sí se puede!
           </div>
         </div>
@@ -634,11 +642,11 @@ function Join() {
 
 function Footer() {
   return (
-    <footer style={{ background: "#1a2b23", padding: "48px 24px 28px" }}>
+    <footer style={{ background: "#002452", padding: "48px 24px 28px" }}>
       <div style={{ maxWidth: 940, margin: "0 auto" }}>
         <div className="footer-top">
           <div>
-            <div className="footer-brand">Luis Barrera Castañón <span style={{ color: "#B8860B" }}>for SMC Board of Trustees </span></div>
+            <div className="footer-brand">Luis Barrera Castañón <span style={{ color: "#F7CF3D" }}>for SMC Board of Trustees </span></div>
             <div className="footer-sub">Santa Monica College Board of Trustees<br />November 2026 Election</div>
           </div>
           <div className="footer-links">
@@ -654,7 +662,7 @@ function Footer() {
         </div>
         <div className="footer-legal">
           Paid for by Luis Barrera Castañón for SMC Board of Trustees 2026 (pending campaign filing).<br />
-          Transparency powered by <span style={{ color: "rgba(184, 134, 11, 0.5)" }}>CivicLens</span>, an open-source civic transparency platform. © 2026
+          Transparency powered by <span style={{ color: "rgba(247, 207, 61, 0.5)" }}>CivicLens</span>, an open-source civic transparency platform. © 2026
         </div>
       </div>
     </footer>
@@ -684,25 +692,25 @@ export default function App() {
         .site-nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(250,247,242,0.92);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid rgba(45,62,54,0.06);transition:box-shadow 0.3s}
         .nav-scrolled{box-shadow:0 1px 12px rgba(0,0,0,0.06)}
         .nav-inner{max-width:1200px;margin:0 auto;padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:64px}
-        .nav-brand{font-family:'DM Serif Display',serif;font-size:18px;color:#2D3E36;text-decoration:none;letter-spacing:-0.02em}
-        .nav-badge{color:#B8860B;margin-left:6px;font-size:11px;font-family:'Source Sans 3',sans-serif;font-weight:600;letter-spacing:0.06em;text-transform:uppercase}
+        .nav-brand{font-family:'DM Serif Display',serif;font-size:18px;color:#003A75;text-decoration:none;letter-spacing:-0.02em}
+        .nav-badge{color:#F7CF3D;margin-left:6px;font-size:11px;font-family:'Source Sans 3',sans-serif;font-weight:600;letter-spacing:0.06em;text-transform:uppercase}
         .nav-links{display:flex;gap:28px;align-items:center}
-        .nav-link{font-family:'Source Sans 3',sans-serif;font-size:12px;font-weight:500;color:#6B7C74;text-decoration:none;text-transform:uppercase;letter-spacing:0.09em;transition:all 0.2s;padding-bottom:3px;border-bottom:2px solid transparent}
-        .nav-link:hover{color:#2D3E36;opacity:1!important}
-        .nav-active{color:#2D3E36!important;font-weight:700;border-bottom-color:#B8860B!important}
+        .nav-link{font-family:'Source Sans 3',sans-serif;font-size:12px;font-weight:500;color:#646469;text-decoration:none;text-transform:uppercase;letter-spacing:0.09em;transition:all 0.2s;padding-bottom:3px;border-bottom:2px solid transparent}
+        .nav-link:hover{color:#003A75;opacity:1!important}
+        .nav-active{color:#003A75!important;font-weight:700;border-bottom-color:#F7CF3D!important}
         .mobile-menu-btn{display:none;background:none;border:none;cursor:pointer;padding:8px;z-index:101}
         .hamburger{width:22px;height:16px;position:relative;display:flex;flex-direction:column;justify-content:space-between}
-        .ham-line{display:block;height:2px;background:#2D3E36;border-radius:1px;transition:all 0.3s;transform-origin:center}
+        .ham-line{display:block;height:2px;background:#003A75;border-radius:1px;transition:all 0.3s;transform-origin:center}
         .ham-top-open{transform:translateY(7px) rotate(45deg)}
         .ham-mid-open{opacity:0}
         .ham-bot-open{transform:translateY(-7px) rotate(-45deg)}
         .mobile-nav{display:none;flex-direction:column;background:#FAF7F2;padding:0 24px;max-height:0;overflow:hidden;transition:max-height 0.35s ease,padding 0.35s ease;border-bottom:1px solid rgba(45,62,54,0.04)}
         .mobile-nav-open{max-height:420px;padding:8px 24px 20px}
-        .mobile-nav-link{font-family:'Source Sans 3',sans-serif;font-size:15px;font-weight:500;color:#4A5D53;text-decoration:none;padding:13px 0;border-bottom:1px solid rgba(45,62,54,0.04);display:block}
-        .mobile-nav-active{color:#2D3E36;font-weight:700}
+        .mobile-nav-link{font-family:'Source Sans 3',sans-serif;font-size:15px;font-weight:500;color:#4A5A6A;text-decoration:none;padding:13px 0;border-bottom:1px solid rgba(45,62,54,0.04);display:block}
+        .mobile-nav-active{color:#003A75;font-weight:700}
 
         /* HERO */
-        .hero-section{min-height:100vh;display:flex;align-items:center;background:linear-gradient(170deg,#2D3E36 0%,#1a2b23 60%,#0f1a14 100%);position:relative;overflow:hidden}
+        .hero-section{min-height:100vh;display:flex;align-items:center;background:linear-gradient(170deg,#003A75 0%,#002452 60%,#001838 100%);position:relative;overflow:hidden}
         .hero-grid{display:grid;grid-template-columns:1fr auto;gap:48px;align-items:center}
         .hero-photo{opacity:0;transform:translateY(30px);transition:all 0.9s cubic-bezier(0.22,1,0.36,1) 0.15s}
         .hero-img{width:320px;height:400px;object-fit:cover;object-position:center top;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,0.3)}
@@ -722,37 +730,37 @@ export default function App() {
         .hero-stats-visible{opacity:1!important;transform:translateY(0)!important}
         .hero-stat{padding:22px 20px;background:rgba(250,247,242,0.035);border-left:1px solid rgba(250,247,242,0.05)}
         .hero-stat:first-child{border-left:none}
-        .stat-num{font-family:'DM Serif Display',serif;font-size:clamp(26px,3vw,36px);color:#B8860B;line-height:1}
+        .stat-num{font-family:'DM Serif Display',serif;font-size:clamp(26px,3vw,36px);color:#F7CF3D;line-height:1}
         .stat-label{font-family:'Source Sans 3',sans-serif;font-size:12px;color:rgba(250,247,242,0.4);margin-top:8px;letter-spacing:0.03em;line-height:1.4}
 
         /* SHARED */
         .section-heading{font-family:'DM Serif Display',serif;font-size:clamp(28px,4.2vw,46px);line-height:1.12;letter-spacing:-0.02em}
-        .section-heading.dark{color:#2D3E36}
+        .section-heading.dark{color:#003A75}
         .section-heading.light{color:#FAF7F2}
         .section-intro{font-family:'Source Serif 4',serif;font-size:17px;line-height:1.65;max-width:560px;margin:12px 0 52px}
-        .section-intro.dark{color:#4A5D53}
+        .section-intro.dark{color:#4A5A6A}
         .section-intro.light{color:rgba(250,247,242,0.5)}
-        .subsection-heading{font-family:'DM Serif Display',serif;font-size:23px;color:#2D3E36;margin:52px 0 18px}
+        .subsection-heading{font-family:'DM Serif Display',serif;font-size:23px;color:#003A75;margin:52px 0 18px}
 
         /* BUTTONS */
-        .btn-primary{font-family:'Source Sans 3',sans-serif;font-size:15px;font-weight:600;color:#1a2b23;background:#B8860B;padding:14px 30px;border-radius:6px;text-decoration:none;letter-spacing:0.01em;transition:all 0.2s;display:inline-block}
-        .btn-primary:hover{background:#a07608;opacity:1!important}
+        .btn-primary{font-family:'Source Sans 3',sans-serif;font-size:15px;font-weight:600;color:#002452;background:#F7CF3D;padding:14px 30px;border-radius:6px;text-decoration:none;letter-spacing:0.01em;transition:all 0.2s;display:inline-block}
+        .btn-primary:hover{background:#d4b135;opacity:1!important}
         .btn-ghost{font-family:'Source Sans 3',sans-serif;font-size:15px;font-weight:600;color:#FAF7F2;background:rgba(250,247,242,0.06);border:1px solid rgba(250,247,242,0.14);padding:14px 30px;border-radius:6px;text-decoration:none;transition:all 0.2s;display:inline-block}
         .btn-ghost:hover{background:rgba(250,247,242,0.1);opacity:1!important}
-        .btn-dark{font-family:'Source Sans 3',sans-serif;font-size:16px;font-weight:600;color:#FAF7F2;background:#2D3E36;padding:16px 40px;border-radius:6px;text-decoration:none;transition:all 0.2s}
-        .btn-dark:hover{background:#1a2b23;opacity:1!important}
+        .btn-dark{font-family:'Source Sans 3',sans-serif;font-size:16px;font-weight:600;color:#FAF7F2;background:#003A75;padding:16px 40px;border-radius:6px;text-decoration:none;transition:all 0.2s}
+        .btn-dark:hover{background:#002452;opacity:1!important}
 
         /* TIMELINE */
         .timeline{position:relative;padding-left:36px}
-        .timeline-line{position:absolute;left:5px;top:8px;bottom:8px;width:2px;background:linear-gradient(to bottom,#B8860B,rgba(184,134,11,0.06))}
+        .timeline-line{position:absolute;left:5px;top:8px;bottom:8px;width:2px;background:linear-gradient(to bottom,#F7CF3D,rgba(184,134,11,0.06))}
         .timeline-item{margin-bottom:42px;position:relative}
         .timeline-item:last-child{margin-bottom:0}
-        .timeline-dot{position:absolute;left:-41px;top:6px;width:12px;height:12px;border-radius:50%;background:#FAF7F2;border:2.5px solid #2D3E36}
-        .timeline-dot-active{background:#B8860B!important;border-color:#B8860B!important}
-        .timeline-year{font-family:'Source Sans 3',sans-serif;font-size:12px;font-weight:700;color:#B8860B;letter-spacing:0.08em;margin-bottom:5px}
-        .timeline-title{font-family:'DM Serif Display',serif;font-size:20px;color:#2D3E36;margin:0 0 8px;line-height:1.3}
-        .timeline-text{font-family:'Source Serif 4',serif;font-size:16px;color:#4A5D53;line-height:1.7;margin:0}
-        .pull-quote{margin-top:52px;padding:28px 32px;background:rgba(45,62,54,0.03);border-radius:8px;border-left:3px solid #B8860B;font-family:'Source Serif 4',serif;font-size:17px;color:#2D3E36;line-height:1.7;font-style:italic}
+        .timeline-dot{position:absolute;left:-41px;top:6px;width:12px;height:12px;border-radius:50%;background:#FAF7F2;border:2.5px solid #003A75}
+        .timeline-dot-active{background:#F7CF3D!important;border-color:#F7CF3D!important}
+        .timeline-year{font-family:'Source Sans 3',sans-serif;font-size:12px;font-weight:700;color:#F7CF3D;letter-spacing:0.08em;margin-bottom:5px}
+        .timeline-title{font-family:'DM Serif Display',serif;font-size:20px;color:#003A75;margin:0 0 8px;line-height:1.3}
+        .timeline-text{font-family:'Source Serif 4',serif;font-size:16px;color:#4A5A6A;line-height:1.7;margin:0}
+        .pull-quote{margin-top:52px;padding:28px 32px;background:rgba(45,62,54,0.03);border-radius:8px;border-left:3px solid #F7CF3D;font-family:'Source Serif 4',serif;font-size:17px;color:#003A75;line-height:1.7;font-style:italic}
 
         /* PRIORITIES */
         .priority-card{background:rgba(250,247,242,0.025);padding:22px 26px;cursor:pointer;border-radius:6px;transition:all 0.25s;border:1px solid rgba(250,247,242,0.03)}
@@ -764,7 +772,7 @@ export default function App() {
         .priority-toggle{color:rgba(250,247,242,0.22);font-size:24px;font-weight:300;transition:transform 0.25s;flex-shrink:0;margin-top:2px;font-family:'Source Sans 3',sans-serif;line-height:1}
 
         /* RECORD */
-        .civiclens-card{background:#2D3E36;border-radius:10px;padding:clamp(28px,4vw,48px) clamp(22px,3vw,40px);position:relative;overflow:hidden}
+        .civiclens-card{background:#003A75;border-radius:10px;padding:clamp(28px,4vw,48px) clamp(22px,3vw,40px);position:relative;overflow:hidden}
         .civiclens-dots{position:absolute;inset:0;opacity:0.03;background-image:radial-gradient(circle at 2px 2px,rgba(255,255,255,0.5) 1px,transparent 0);background-size:24px 24px}
         .civiclens-status{display:flex;align-items:center;gap:10px;margin-bottom:24px}
         .civiclens-status span{font-family:'Source Sans 3',sans-serif;font-size:12px;color:rgba(250,247,242,0.45);font-weight:600;letter-spacing:0.08em;text-transform:uppercase}
@@ -774,30 +782,30 @@ export default function App() {
         .civiclens-desc{font-family:'Source Serif 4',serif;font-size:15px;color:rgba(250,247,242,0.5);line-height:1.7;margin:0 0 24px}
         .record-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
         .record-stat{background:rgba(250,247,242,0.035);border-radius:6px;padding:16px 18px}
-        .stat-num-sm{font-family:'DM Serif Display',serif;font-size:clamp(20px,2.2vw,28px);color:#B8860B;line-height:1}
+        .stat-num-sm{font-family:'DM Serif Display',serif;font-size:clamp(20px,2.2vw,28px);color:#F7CF3D;line-height:1}
         .stat-label-sm{font-family:'Source Sans 3',sans-serif;font-size:12px;color:rgba(250,247,242,0.45);margin-top:6px}
         .stat-sub{font-family:'Source Sans 3',sans-serif;font-size:11px;color:rgba(250,247,242,0.22);margin-top:2px}
 
         /* COMMUNITY */
         .community-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:8px}
         .community-card{background:#FAF7F2;border-radius:6px;padding:16px 20px;border:1px solid rgba(45,62,54,0.04)}
-        .community-org{font-family:'Source Sans 3',sans-serif;font-size:14px;font-weight:700;color:#2D3E36;margin:0;line-height:1.35}
-        .community-role{font-family:'Source Serif 4',serif;font-size:13px;color:#6B7C74}
-        .badge-current{background:rgba(74,222,128,0.1);color:#2D6A4F;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;font-family:'Source Sans 3',sans-serif;letter-spacing:0.04em;text-transform:uppercase;white-space:nowrap}
-        .career-card{padding:20px 26px;background:#FAF7F2;border-radius:8px;border-left:3px solid #B8860B}
-        .career-title{font-family:'Source Sans 3',sans-serif;font-size:15px;font-weight:700;color:#2D3E36;line-height:1.3}
-        .career-org{font-family:'Source Sans 3',sans-serif;font-size:13px;font-weight:600;color:#B8860B;margin-top:2px}
-        .career-desc{font-family:'Source Serif 4',serif;font-size:14px;color:#6B7C74;margin-top:6px;line-height:1.5}
-        .education-card{margin-top:20px;padding:20px 26px;background:#FAF7F2;border-radius:8px;border-left:3px solid #2D3E36}
-        .policy-card{margin-top:10px;padding:20px 26px;background:#FAF7F2;border-radius:8px;border-left:3px solid #B8860B}
-        .education-label{font-family:'Source Sans 3',sans-serif;font-size:12px;font-weight:600;color:#6B7C74;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:8px}
-        .education-list{font-family:'Source Serif 4',serif;font-size:15px;color:#2D3E36;line-height:1.8}
+        .community-org{font-family:'Source Sans 3',sans-serif;font-size:14px;font-weight:700;color:#003A75;margin:0;line-height:1.35}
+        .community-role{font-family:'Source Serif 4',serif;font-size:13px;color:#646469}
+        .badge-current{background:rgba(74,222,128,0.1);color:#004C98;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;font-family:'Source Sans 3',sans-serif;letter-spacing:0.04em;text-transform:uppercase;white-space:nowrap}
+        .career-card{padding:20px 26px;background:#FAF7F2;border-radius:8px;border-left:3px solid #F7CF3D}
+        .career-title{font-family:'Source Sans 3',sans-serif;font-size:15px;font-weight:700;color:#003A75;line-height:1.3}
+        .career-org{font-family:'Source Sans 3',sans-serif;font-size:13px;font-weight:600;color:#F7CF3D;margin-top:2px}
+        .career-desc{font-family:'Source Serif 4',serif;font-size:14px;color:#646469;margin-top:6px;line-height:1.5}
+        .education-card{margin-top:20px;padding:20px 26px;background:#FAF7F2;border-radius:8px;border-left:3px solid #003A75}
+        .policy-card{margin-top:10px;padding:20px 26px;background:#FAF7F2;border-radius:8px;border-left:3px solid #F7CF3D}
+        .education-label{font-family:'Source Sans 3',sans-serif;font-size:12px;font-weight:600;color:#646469;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:8px}
+        .education-list{font-family:'Source Serif 4',serif;font-size:15px;color:#003A75;line-height:1.8}
 
         /* JOIN */
         .join-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;max-width:680px;margin:0 auto}
         .join-card{background:white;border-radius:8px;padding:30px 22px;border:1px solid rgba(45,62,54,0.05);text-align:center}
-        .join-title{font-family:'Source Sans 3',sans-serif;font-size:16px;font-weight:700;color:#2D3E36;margin:0 0 6px}
-        .join-desc{font-family:'Source Serif 4',serif;font-size:14px;color:#6B7C74;margin:0;line-height:1.5}
+        .join-title{font-family:'Source Sans 3',sans-serif;font-size:16px;font-weight:700;color:#003A75;margin:0 0 6px}
+        .join-desc{font-family:'Source Serif 4',serif;font-size:14px;color:#646469;margin:0;line-height:1.5}
 
         /* FOOTER */
         .footer-top{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-start;gap:32px}
