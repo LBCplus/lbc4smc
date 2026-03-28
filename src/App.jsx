@@ -300,6 +300,47 @@ function Priorities() {
 
 function Record() {
   const [ref, vis] = useInView();
+  const [query, setQuery] = useState("");
+  const [answer, setAnswer] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [sources, setSources] = useState(null);
+  const [history, setHistory] = useState([]);
+
+  const askQuestion = async () => {
+    if (!query.trim() || loading) return;
+    const q = query.trim();
+    setQuery("");
+    setLoading(true);
+    setAnswer(null);
+    setSources(null);
+
+    try {
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ question: q })
+      });
+      const data = await res.json();
+      if (data.error) {
+        setAnswer("Sorry, I couldn't process that question. Please try again.");
+      } else {
+        setAnswer(data.answer);
+        setSources(data.sources);
+        setHistory(prev => [...prev, { q, a: data.answer, s: data.sources }]);
+      }
+    } catch {
+      setAnswer("Connection error. Please try again.");
+    }
+    setLoading(false);
+  };
+
+  const sampleQuestions = [
+    "How has the board voted on campus safety since 2024?",
+    "What workforce development decisions has the board made?",
+    "How did trustees vote on the annual budget?",
+    "What has Dr. Barrera Castañón voted on since joining?",
+  ];
+
   return (
     <section id="record" style={{ background: "#FAF7F2", padding: "100px 24px" }}>
       <div ref={ref} style={{ maxWidth: 860, margin: "0 auto" }}>
@@ -307,9 +348,8 @@ function Record() {
         <h2 className="section-heading dark">Judge me by my votes,<br />not my words.</h2>
         <p className="section-intro dark">
           Every vote I've cast since my appointment in February 2025 is public record. 
-          This section will let you search, filter, and explore my complete voting history — 
+          Search, filter, and explore the complete voting history of every SMC trustee — 
           powered by CivicLens, an open-source civic transparency platform which I designed, built and launched.
-          You can also search for all Board of Trustee votes and their public record comments. This is transparency!
         </p>
 
         <div className="civiclens-card" style={{
@@ -320,30 +360,131 @@ function Record() {
           <div className="civiclens-dots" />
           <div style={{ position: "relative" }}>
             <div className="civiclens-status">
-              <div className="status-dot" />
-              <span>CivicLens · Building Now</span>
+              <div className="status-dot" style={{ background: "#4ade80", boxShadow: "0 0 8px rgba(74,222,128,0.6)" }} />
+              <span>CivicLens · Live</span>
             </div>
 
-            <div className="search-preview">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(250,247,242,0.25)" strokeWidth="2">
-                <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-              </svg>
-              <span>Ask about any board decision, vote, or policy...</span>
+            {/* Search Input */}
+            <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
+              <input
+                type="text"
+                value={query}
+                onChange={e => setQuery(e.target.value)}
+                onKeyDown={e => e.key === "Enter" && askQuestion()}
+                placeholder="Ask about any board decision, vote, or policy..."
+                style={{
+                  flex: 1, padding: "14px 18px", borderRadius: 8,
+                  border: "1px solid rgba(250,247,242,0.15)",
+                  background: "rgba(250,247,242,0.08)", color: "#FAF7F2",
+                  fontFamily: "'Source Sans 3', sans-serif", fontSize: 15,
+                  outline: "none"
+                }}
+              />
+              <button
+                onClick={askQuestion}
+                disabled={loading || !query.trim()}
+                style={{
+                  padding: "14px 24px", borderRadius: 8, border: "none",
+                  background: loading ? "#646469" : "#F7CF3D", color: "#001838",
+                  fontFamily: "'Source Sans 3', sans-serif", fontWeight: 700,
+                  fontSize: 14, cursor: loading ? "wait" : "pointer",
+                  letterSpacing: "0.04em", textTransform: "uppercase",
+                  transition: "background 0.2s"
+                }}
+              >
+                {loading ? "Searching..." : "Ask"}
+              </button>
             </div>
+
+            {/* Sample Questions */}
+            {!answer && !loading && history.length === 0 && (
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 20 }}>
+                {sampleQuestions.map((sq, i) => (
+                  <button key={i} onClick={() => { setQuery(sq); }}
+                    style={{
+                      padding: "8px 14px", borderRadius: 20, border: "1px solid rgba(250,247,242,0.15)",
+                      background: "rgba(250,247,242,0.05)", color: "rgba(250,247,242,0.7)",
+                      fontFamily: "'Source Sans 3', sans-serif", fontSize: 13,
+                      cursor: "pointer", transition: "all 0.2s"
+                    }}
+                  >{sq}</button>
+                ))}
+              </div>
+            )}
+
+            {/* Loading State */}
+            {loading && (
+              <div style={{
+                padding: "24px", background: "rgba(250,247,242,0.04)", borderRadius: 8,
+                marginBottom: 16, color: "rgba(250,247,242,0.6)",
+                fontFamily: "'Source Sans 3', sans-serif", fontSize: 15
+              }}>
+                <span style={{ display: "inline-block", animation: "pulse 1.5s infinite" }}>
+                  Searching 349 meetings and 2,656 votes...
+                </span>
+              </div>
+            )}
+
+            {/* Answer */}
+            {answer && !loading && (
+              <div style={{
+                padding: "24px", background: "rgba(250,247,242,0.06)", borderRadius: 8,
+                marginBottom: 16, border: "1px solid rgba(250,247,242,0.1)"
+              }}>
+                <div style={{
+                  color: "#FAF7F2", fontFamily: "'Source Serif 4', serif",
+                  fontSize: 16, lineHeight: 1.75, whiteSpace: "pre-wrap"
+                }}>
+                  {answer}
+                </div>
+                {sources && (
+                  <div style={{
+                    marginTop: 16, paddingTop: 12, borderTop: "1px solid rgba(250,247,242,0.1)",
+                    color: "rgba(250,247,242,0.5)", fontSize: 13,
+                    fontFamily: "'Source Sans 3', sans-serif"
+                  }}>
+                    Sources: {sources.meetings_found} meetings, {sources.votes_found} votes, {sources.decisions_found} decisions searched
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Previous Q&A History */}
+            {history.length > 0 && !loading && (
+              <div style={{ marginBottom: 16 }}>
+                {history.slice(0, -1).reverse().map((h, i) => (
+                  <details key={i} style={{ marginBottom: 8 }}>
+                    <summary style={{
+                      color: "rgba(250,247,242,0.6)", cursor: "pointer",
+                      fontFamily: "'Source Sans 3', sans-serif", fontSize: 14, padding: "8px 0"
+                    }}>
+                      {h.q}
+                    </summary>
+                    <div style={{
+                      padding: "12px 16px", background: "rgba(250,247,242,0.03)",
+                      borderRadius: 6, color: "rgba(250,247,242,0.8)",
+                      fontFamily: "'Source Serif 4', serif", fontSize: 14, lineHeight: 1.7
+                    }}>
+                      {h.a}
+                    </div>
+                  </details>
+                ))}
+              </div>
+            )}
 
             <p className="civiclens-desc">
-              I am the Founder and CEO of EmpathySystem.ai an AI Database Company for the Healthcare and Nonprofit sectors. 
-              I took my technical knowledge and built an AI-powered Q&A system that gathers the SMC Board of Trustees 
-              public meeting minutes and makes them searchable in plain language. Every answer 
+              I am the Founder and CEO of EmpathySystem.ai, an AI Database Company for the Healthcare and Nonprofit sectors. 
+              I took my technical knowledge and built an AI-powered Q&A system that indexes 25 years of SMC Board of Trustees 
+              public meeting records and makes them searchable in plain language. Every answer is 
               grounded in actual board documents with specific citations — dates, vote 
               counts, and full context. No candidate has ever done this before.
             </p>
 
             <div className="record-stats">
               {[
-                { value: "39+", label: "Board meetings indexed", sub: "Feb 2025 – present" },
-                { value: "1,107", label: "Public documents scraped", sub: "Agendas & minutes" },
-                { value: "admin.smc.edu", label: "Official data source", sub: "Public records only" }
+                { value: "349", label: "Board meetings indexed", sub: "1998 – 2026" },
+                { value: "2,656", label: "Votes tracked", sub: "Every trustee, every vote" },
+                { value: "9,819", label: "Decisions cataloged", sub: "Budget, policy, personnel" }
               ].map((s, i) => (
                 <div key={i} className="record-stat">
                   <div className="stat-num-sm">{s.value}</div>
@@ -570,10 +711,10 @@ function Espanol() {
           }}>
             Soy Fundador y CEO de EmpathySystem.ai, una empresa de bases de datos con inteligencia 
             artificial para los sectores de salud y organizaciones sin fines de lucro. Usé ese conocimiento 
-            técnico para construir CivicLens — un sistema de preguntas y respuestas que recopila 
-            las minutas públicas del Consejo de Administración de SMC y las hace buscables en 
-            lenguaje sencillo. También puede buscar los votos de todos los miembros del Consejo. 
-            Ningún candidato ha hecho esto antes. ¡Esto es transparencia!
+            técnico para construir CivicLens — un sistema de preguntas y respuestas que indexa 
+            349 reuniones del Consejo de Administración de SMC desde 1998, rastreando 2,656 votos y 
+            9,819 decisiones. Cada respuesta está basada en documentos reales del Consejo con 
+            citas específicas. Ningún candidato ha hecho esto antes. ¡Esto es transparencia!
           </p>
         </div>
 
@@ -692,8 +833,8 @@ export default function App() {
         .site-nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(250,247,242,0.92);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid rgba(45,62,54,0.06);transition:box-shadow 0.3s}
         .nav-scrolled{box-shadow:0 1px 12px rgba(0,0,0,0.06)}
         .nav-inner{max-width:1200px;margin:0 auto;padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:64px}
-        .nav-brand{font-family:'DM Serif Display',serif;font-size:22px;color:#003A75;text-decoration:none;letter-spacing:-0.02em;text-shadow:0.5px 0.5px 0 #F7CF3D,-0.5px -0.5px 0 #F7CF3D}
-        .nav-badge{color:#F7CF3D;margin-left:8px;font-size:22px;font-family:'DM Serif Display',serif;font-weight:400;letter-spacing:-0.02em;text-transform:none;text-shadow:0.5px 0.5px 0 #003A75,-0.5px -0.5px 0 #003A75}
+        .nav-brand{font-family:'DM Serif Display',serif;font-size:18px;color:#003A75;text-decoration:none;letter-spacing:-0.02em}
+        .nav-badge{color:#F7CF3D;margin-left:6px;font-size:11px;font-family:'Source Sans 3',sans-serif;font-weight:600;letter-spacing:0.06em;text-transform:uppercase}
         .nav-links{display:flex;gap:28px;align-items:center}
         .nav-link{font-family:'Source Sans 3',sans-serif;font-size:12px;font-weight:500;color:#646469;text-decoration:none;text-transform:uppercase;letter-spacing:0.09em;transition:all 0.2s;padding-bottom:3px;border-bottom:2px solid transparent}
         .nav-link:hover{color:#003A75;opacity:1!important}
