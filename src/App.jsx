@@ -708,8 +708,8 @@ export default function App() {
         .hero-img{width:320px;height:400px;object-fit:cover;object-position:center top;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,0.3)}
         .story-photos{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:20px 0 40px 36px}
         .story-photos-single{grid-template-columns:1fr;max-width:300px}
-        .story-photo{width:100%;border-radius:8px;object-fit:cover;max-height:220px}
-        .story-photo-tall{max-height:300px}
+        .story-photo{width:100%;border-radius:8px;object-fit:contain}
+        .story-photo-tall{object-fit:contain}
         .hero-dots{position:absolute;inset:0;opacity:0.04;background-image:radial-gradient(circle at 2px 2px,rgba(255,255,255,0.4) 1px,transparent 0);background-size:32px 32px}
         .hero-glow{position:absolute;top:-20%;right:-10%;width:60%;height:140%;background:radial-gradient(ellipse,rgba(184,134,11,0.07) 0%,transparent 70%);pointer-events:none}
         .hero-glow-2{position:absolute;bottom:-10%;left:-5%;width:40%;height:60%;background:radial-gradient(ellipse,rgba(184,134,11,0.04) 0%,transparent 70%);pointer-events:none}
