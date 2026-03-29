@@ -83,7 +83,7 @@ function Nav({ active, menuOpen, setMenuOpen }) {
 function SectionLabel({ children, light }) {
   return (
     <div style={{
-      fontFamily: "'Source Sans 3', sans-serif", fontSize: 12, fontWeight: 600,
+      fontFamily: "'Source Sans 3', sans-serif", fontSize: 18, fontWeight: 700,
       color: "#F7CF3D", letterSpacing: "0.16em", textTransform: "uppercase",
       marginBottom: 16, display: "flex", alignItems: "center", gap: 12
     }}>
@@ -903,7 +903,7 @@ export default function App() {
         .timeline-item:last-child{margin-bottom:0}
         .timeline-dot{position:absolute;left:-41px;top:6px;width:12px;height:12px;border-radius:50%;background:#FAF7F2;border:2.5px solid #003A75}
         .timeline-dot-active{background:#F7CF3D!important;border-color:#F7CF3D!important}
-        .timeline-year{font-family:'Source Sans 3',sans-serif;font-size:16px;font-weight:700;color:#F7CF3D;letter-spacing:0.08em;margin-bottom:5px}
+        .timeline-year{font-family:'Source Sans 3',sans-serif;font-size:20px;font-weight:700;color:#F7CF3D;letter-spacing:0.08em;margin-bottom:5px}
         .timeline-title{font-family:'DM Serif Display',serif;font-size:20px;color:#003A75;margin:0 0 8px;line-height:1.3}
         .timeline-text{font-family:'Source Serif 4',serif;font-size:16px;color:#4A5A6A;line-height:1.7;margin:0}
         .pull-quote{margin-top:52px;padding:28px 32px;background:rgba(45,62,54,0.03);border-radius:8px;border-left:3px solid #F7CF3D;font-family:'Source Serif 4',serif;font-size:17px;color:#003A75;line-height:1.7;font-style:italic}
