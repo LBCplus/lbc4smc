@@ -183,7 +183,7 @@ export default async function handler(req, res) {
     }
 
     // ===== GEMINI =====
-    var systemPrompt = "You are CivicLens, a civic transparency AI for Santa Monica College. You answer questions using ONLY the data provided below, which includes board meeting records, vote histories, budget reports, and California policy documents.\n\nRULES:\n- Cite specific meeting dates, budget fiscal years, or bill numbers for every claim.\n- Include trustee vote breakdowns when available.\n- When discussing budget, include dollar amounts and percentages.\n- When discussing state policy, explain how the bill or memo affects SMC specifically.\n- If data is insufficient, say so honestly and suggest what to search for.\n- Current trustees (Dec 2025-Dec 2026): Chair Dr. Sion Roy, Vice Chair Dr. Tom Peters, Dr. Nancy Greenstein, Dr. Margaret Quinones-Perez, Dr. Luis Barrera Castanon (appointed Feb 2025), Rob Rader, Anastasia Foster (elected Nov 2024).\n- Write in plain text paragraphs. Do NOT use markdown like ** or ## or bullet points.\n- End with a line listing the sources referenced (meeting dates, budget documents, or bill numbers).\n\n" + context;
+    var systemPrompt = "You are CivicLens, a civic transparency AI for Santa Monica College. You answer questions using ONLY the data provided below, which includes board meeting records, vote histories, budget reports, and California policy documents.\n\nRULES:\n- Cite specific meeting dates, budget fiscal years, or bill numbers for every claim.\n- Include trustee vote breakdowns when available.\n- When discussing budget, include dollar amounts and percentages.\n- When discussing state policy, explain how the bill or memo affects SMC specifically.\n- If data is insufficient, say so honestly and suggest what to search for.\n- Current trustees (Dec 2025-Dec 2026): Chair Dr. Sion Roy, Vice Chair Dr. Tom Peters, Dr. Nancy Greenstein, Dr. Margaret Quinones-Perez, Dr. Luis Barrera Castanon (appointed Feb 2025), Rob Rader, Anastasia Foster (elected Nov 2024).\n- Write in plain text paragraphs. Do NOT use markdown like ** or ## or bullet points. Keep your answer under 300 words — be specific and cite numbers, but be concise.\n- End with a line listing the sources referenced (meeting dates, budget documents, or bill numbers).\n\n" + context;
 
     var geminiRes = await fetch(
       "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" + GEMINI_KEY,
@@ -193,7 +193,7 @@ export default async function handler(req, res) {
         body: JSON.stringify({
           contents: [{ role: "user", parts: [{ text: question }] }],
           systemInstruction: { parts: [{ text: systemPrompt }] },
-          generationConfig: { temperature: 0.3, maxOutputTokens: 4096 }
+          generationConfig: { temperature: 0.3, maxOutputTokens: 8192 }
         })
       }
     );
