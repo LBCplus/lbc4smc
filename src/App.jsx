@@ -519,7 +519,10 @@ function Community() {
     { org: "Raza Golf Foundation", role: "Board Member", c: true },
   ];
   const career = [
+    { title: "Founder & CEO", org: "EmpathySystem.ai", desc: "AI-powered data systems for healthcare, nonprofits, and civic transparency" },
+    { title: "Executive Director", org: "BuildWithin", desc: "Apprenticeship innovation — tech, healthcare, and emerging industries" },
     { title: "Strategic Impact Officer", org: "Goodwill Southern California", desc: "Led 200+ staff in workforce development at SoCal's largest nonprofit" },
+    { title: "Managing Director", org: "LBC+ Consulting & Creative", desc: "Workforce program architecture for nonprofits and public agencies" },
     { title: "Manager, Education Policy & Programs", org: "LA Area Chamber of Commerce", desc: "Linked Learning, Deeper Learning, Smart Justice, adult education policy" },
     { title: "Sr. Coordinator, K-16 Education & Workforce", org: "National Council of La Raza (UnidosUS)", desc: "Multi-state portfolio — CA, TX, MN, CO, and DC" },
     { title: "Youth Workforce Services Coordinator", org: "Para Los Niños", desc: "College and career programs serving East LA and Downtown LA's Skid Row" },
@@ -836,7 +839,7 @@ export default function App() {
         .nav-scrolled{box-shadow:0 1px 12px rgba(0,0,0,0.06)}
         .nav-inner{max-width:1200px;margin:0 auto;padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:64px}
         .nav-brand{font-family:'DM Serif Display',serif;font-size:18px;color:#003A75;text-decoration:none;letter-spacing:-0.02em}
-        .nav-badge{color:#003A75;margin-left:6px;font-size:11px;font-family:'Source Sans 3',sans-serif;font-weight:600;letter-spacing:0.06em;text-transform:uppercase}
+        .nav-badge{color:#F7CF3D;margin-left:6px;font-size:11px;font-family:'Source Sans 3',sans-serif;font-weight:600;letter-spacing:0.06em;text-transform:uppercase}
         .nav-links{display:flex;gap:28px;align-items:center}
         .nav-link{font-family:'Source Sans 3',sans-serif;font-size:12px;font-weight:500;color:#646469;text-decoration:none;text-transform:uppercase;letter-spacing:0.09em;transition:all 0.2s;padding-bottom:3px;border-bottom:2px solid transparent}
         .nav-link:hover{color:#003A75;opacity:1!important}
