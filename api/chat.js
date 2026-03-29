@@ -36,6 +36,6 @@ export default async function handler(req, res) {
     const geminiData = await geminiRes.json();
     if (geminiData.error) return res.status(500).json({ error: geminiData.error.message });
     const answer = geminiData.candidates?.[0]?.content?.parts?.[0]?.text || "I couldn't generate a response.";
-    return res.status(200).json({ answer, sources: { meetings_found: allMeetings.length, votes_found: votes.length, decisions_found: decisions.length } });
+    return res.status(200).json({ answer, sources: { meetings_found: allMeetings.length, votes_found: votes.length, decisions_found: decisions.length, budget_docs_found: budgetDocs.length } });
   } catch (err) { console.error("CivicLens API error:", err); return res.status(500).json({ error: "Something went wrong. Please try again." }); }
 }
