@@ -608,12 +608,12 @@ function Community() {
 function Espanol() {
   const [exp, setExp] = useState(null);
   const prioridades = [
-    { icon: "📊", title: "Responsabilidad Fiscal", summary: "SMC lleva 7 años dependiendo de protecciones fiscales estatales. Ya es hora de actuar.", detail: "SMC ha operado bajo la provisión Hold Harmless desde 2018 — lo que significa que el colegio no genera suficientes resultados de éxito estudiantil para justificar su financiamiento. Cuando esta protección expire, SMC enfrentará un déficit de ~$17 millones anuales. Mientras tanto, el 91.4% del presupuesto discrecional se destina a costos de personal. Del fondo general, $0 se invierte en desarrollo laboral. Estoy impulsando un análisis de alineación con la fórmula estatal y un presupuesto basado en resultados." },
-    { icon: "🎓", title: "Éxito Estudiantil como Estrategia", summary: "Invertir en estudiantes no solo es lo correcto — es como el colegio recibe fondos.", detail: "California premia a los colegios por completar programas, transferencias y que sus egresados alcancen un salario digno. Estoy abogando por un enfoque estratégico en Trayectorias Profesionales, la expansión de educación técnica, y caminos claros desde la inscripción hasta empleos con salarios dignos." },
-    { icon: "🛡️", title: "Seguridad y Cultura Laboral", summary: "Después del asesinato en el campus en octubre 2024, hay que reconstruir la confianza.", detail: "El incidente de violencia laboral del 14 de octubre de 2024 expuso fallas críticas — cámaras sin funcionar, iluminación inadecuada, entrenamiento de emergencia inconsistente. A lo largo de mi carrera, he reconstruido la confianza mediante planes claros, metas organizacionales realistas y comunicación transparente." },
-    { icon: "💼", title: "Alianzas Laborales Regionales", summary: "El presupuesto general de SMC no muestra estrategia para conectar estudiantes con carreras.", detail: "El salario digno es una métrica de financiamiento estatal — pero SMC no tiene inversiones identificables en servicios de carrera o relaciones con empleadores. Estoy impulsando la alineación laboral regional y asociaciones sectoriales conectadas directamente con la fórmula de financiamiento." },
-    { icon: "🏠", title: "Vivienda Estudiantil en Campus Bundy", summary: "El bono que los votantes aprobaron fue para ayudar a los estudiantes más necesitados.", detail: "Los residentes de Santa Mónica votaron por un bono que estipuló vivienda para estudiantes sin hogar o en riesgo. Como guardianes honestos de nuestra comunidad, debemos asegurar que este bono cumpla exactamente lo que los votantes aprobaron." },
-    { icon: "🌎", title: "Equidad, Acceso y Recuperación", summary: "La matrícula ha bajado significativamente desde 2018. Necesitamos un plan, no solo recortes.", detail: "SMC ha perdido estudiantes en todas las poblaciones. Las discusiones de la junta se enfocan demasiado en recortes. Estoy comprometido a cambiar esa conversación: alcance dirigido, programas alineados con el mercado laboral, y asegurar que SMC siga siendo un faro de innovación e inclusión." }
+    { icon: "📊", title: "Responsabilidad Fiscal", summary: "El colegio de Santa Mónica lleva 7 años dependiendo de protecciones fiscales estatales. Ya es hora de actuar.", detail: "El colegio de Santa Mónica ha operado bajo la provisión Hold Harmless desde 2018 — lo que significa que el colegio no genera suficientes resultados de éxito estudiantil para justificar su financiamiento. Cuando esta protección expire, el colegio de Santa Mónica enfrentará un balance de ~$17 millones anuales. Mientras tanto, el 91.4% del presupuesto discrecional son costos de empleados. La mejor práctica es un porcentaje de alrededor del 82%. Del fondo general, $0 se invierte en desarrollo laboral. Estoy proponiendo un análisis de alineación con la fórmula estatal y un presupuesto basado en resultados." },
+    { icon: "🎓", title: "Estrategia para el Éxito Estudiantil", summary: "Invertir en estudiantes no solo es lo correcto — es como el colegio recibe fondos.", detail: "California premia a los colegios por completar programas, matriculación y el alcance de salarios digno. Estoy proponiendo por un enfoque estratégico en Trayectorias Profesionales, la expansión de educación técnica, y caminos claros desde la primera inscripción hasta empleo con salario digno." },
+    { icon: "🛡️", title: "Seguridad y Cultura Laboral", summary: "Después del asesinato en el colegio en octubre del 2024, hay que reconstruir la confianza.", detail: "El incidente de violencia laboral del 14 de octubre de 2024 expuso fallas críticas — cámaras sin funcionar, iluminación inadecuada, entrenamiento de emergencia inconsistente. A lo largo de mi carrera, he reconstruido la confianza mediante planes claros, metas organizacionales realistas y comunicación transparente. Esto es lo que necesitamos en el colegio." },
+    { icon: "💼", title: "Alianzas Laborales Regionales", summary: "El presupuesto general de el colegio de Santa Mónica no muestra estrategia para conectar estudiantes con carreras.", detail: "El salario digno es una métrica de financiamiento estatal — pero el colegio de Santa Mónica no tiene inversiones identificables en servicios de carrera o relaciones con empleadores. Estoy proponiendo la alineación laboral regional y asociaciones sectoriales conectadas directamente con la fórmula de financiamiento." },
+    { icon: "🏠", title: "Vivienda Estudiantil en el Colegio", summary: "El dinero que los votantes aprobaron fue para ayudar a los estudiantes más necesitados.", detail: "Los residentes de Santa Mónica votaron por un bono que estipuló vivienda para estudiantes sin hogar o en riesgo. Como administradores financieros de nuestra comunidad, debemos asegurar que este bono cumpla exactamente lo que los votantes aprobaron." },
+    { icon: "🌎", title: "Equidad, Acceso y Recuperación", summary: "La inscripción de estudiantes ha bajado significativamente desde 2018. Necesitamos un plan, no solo reducciones.", detail: "El colegio de Santa Mónica ha perdido estudiantes en todas las poblaciones. Las discusiones de la junta se enfocan demasiado en reducciones. Estoy proponiendo un cambio de esta conversación: alcance dirigido, programas alineados con el mercado laboral, y asegurar que el colegio de Santa Mónica siga siendo un lugar de innovación e inclusión." }
   ];
 
   return (
@@ -636,10 +636,11 @@ function Espanol() {
           color: "rgba(250, 247, 242, 0.6)", lineHeight: 1.7,
           maxWidth: 600, margin: "0 0 40px"
         }}>
-          Hace más de veinticinco años, caminaba por el Bulevar Pico como un joven 
-          indocumentado y vi un anuncio de Santa Monica College en un autobús. Esa 
-          decisión cambió el rumbo de mi vida. Hoy busco su apoyo para asegurar 
-          que SMC continúe esta misión.
+          Hace más de veinticinco años que caminaba por la calle Pico, era un joven 
+          indocumentado, y vi un anuncio para el colegio de nuestra Santa Mónica en un 
+          autobús. Esa decisión cambió el rumbo de mi vida. Hoy busco su apoyo para 
+          asegurar que este colegio continúe su misión de educar, innovar y inspirar 
+          la próxima generación.
         </p>
 
         {/* Mi Historia */}
@@ -656,18 +657,21 @@ function Espanol() {
             color: "rgba(250, 247, 242, 0.6)", lineHeight: 1.75, margin: 0
           }}>
             En 1988, mi familia llegó a California como inmigrantes indocumentados después de 
-            un viaje de un mes por Latinoamérica. No conocíamos a nadie. Mi padre comenzó en los 
-            campos del Valle Central y luego pasó a equipos de limpieza en los edificios del centro 
-            de Los Ángeles. En enero del 2000, me inscribí en SMC buscando un certificado de plomería 
-            que no existía — pero para entonces, SMC ya había encendido algo en mí. Como estudiante 
-            indocumentado, encontré seguridad y aceptación en la comunidad. Me uní al gobierno estudiantil 
-            y fui Presidente del Cuerpo Estudiantil. Me transferí a UC Berkeley y obtuve mi licenciatura. 
-            Desde el sector privado en Silicon Valley hasta las oficinas de Para Los Niños en Skid Row, 
-            el National Council de La Raza, la Cámara de Comercio de Los Ángeles, la Fundación para 
-            los Colegios Comunitarios de California, y liderando a más de 200 empleados en Goodwill 
-            Southern California — pasé casi dos décadas construyendo trayectorias profesionales para 
-            las comunidades de donde vengo. No por suerte, sino con intención. En febrero de 2025, 
-            fui nombrado al Consejo de Administración de SMC. El círculo se cerró.
+            un viaje largo por Latinoamérica. No conocíamos a nadie. Mi padre comenzó en los 
+            campos de Salinas y luego pasó a equipos de limpieza en los edificios del centro 
+            de Los Ángeles. En enero del 2000, me inscribí en el colegio de Santa Mónica 
+            buscando un certificado de construcción que no existía — pero no importo, el colegio 
+            ya había encendido algo en mí curiosidad. Como estudiante indocumentado, encontré 
+            seguridad y aceptación en la comunidad. Me uní al gobierno estudiantil y llegue a 
+            la posición de Presidente Estudiantil del colegio. Luego me transferí a la Universidad 
+            de Berkeley y obtuve mi licenciatura. Comencé mi carrera el sector privado de Silicon 
+            Valley hasta llegar a las oficinas de Para Los Niños en el centro de Los Ángeles. Con 
+            posiciones con el Consejo Nacional de La Raza, la Cámara de Comercio de Los Ángeles, 
+            la Fundación para los Colegios Comunitarios de California, y gerente de más de 200 
+            empleados con Goodwill del Sur de California — pasé casi dos décadas en el diseño de 
+            programas para comunidades inmigrantes, personas encarceladas y jóvenes sin dirección. 
+            No por suerte, sino con intención. En febrero de 2025, fui nombrado al Consejo de 
+            Administración del colegio de Santa Mónica. El círculo de la vida se cerró.
           </p>
         </div>
 
@@ -712,11 +716,12 @@ function Espanol() {
             fontFamily: "'Source Serif 4', serif", fontSize: 16,
             color: "rgba(250, 247, 242, 0.6)", lineHeight: 1.75, margin: 0
           }}>
-            Soy Fundador y CEO de EmpathySystem.ai, una empresa de bases de datos con inteligencia 
+            Soy Fundador y Dueño de EmpathySystem.ai, una empresa de inteligencia 
             artificial para los sectores de salud y organizaciones sin fines de lucro. Usé ese conocimiento 
             técnico para construir CivicLens — un sistema de preguntas y respuestas que indexa 
-            349 reuniones del Consejo de Administración de SMC desde 1998, rastreando 2,656 votos, 
-            9,819 decisiones, 72 informes presupuestarios y 47 documentos de política estatal. Cada respuesta está basada en documentos reales del Consejo con 
+            349 reuniones del Consejo de Administración del colegio desde 1998, rastreando 2,656 votos, 
+            9,819 decisiones, 72 informes presupuestarios y 47 documentos de política estatal. 
+            Cada respuesta está basada en documentos reales del Consejo con 
             citas específicas. Ningún candidato ha hecho esto antes. ¡Esto es transparencia!
           </p>
         </div>
@@ -728,8 +733,8 @@ function Espanol() {
             color: "rgba(250, 247, 242, 0.5)", lineHeight: 1.7,
             maxWidth: 520, margin: "0 auto 12px"
           }}>
-            Este contenido fue escrito para nuestra comunidad — no es una traducción. 
-            Cada palabra es revisada personalmente para reflejar nuestra cultura y nuestras voces.
+            Este contenido fue escrito para nuestra comunidad. Cada palabra es mía 
+            y revisada personalmente para reflejar nuestra cultura y nuestra voz.
           </p>
           <p style={{
             fontFamily: "'Source Serif 4', serif", fontSize: 16,
@@ -740,7 +745,7 @@ function Espanol() {
             sino como un derecho.
           </p>
           <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: 24, color: "#F7CF3D" }}>
-            ¡Sí se puede!
+            ¡Sí se puede!<br />¡Y sí se pudo!
           </div>
         </div>
       </div>
