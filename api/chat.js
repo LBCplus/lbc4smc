@@ -17,7 +17,6 @@ export default async function handler(req, res) {
 
   var h = { apikey: SUPABASE_KEY, Authorization: "Bearer " + SUPABASE_KEY };
 
-  // Helper: safe fetch that never throws
   async function safeFetch(url) {
     try {
       var r = await fetch(url, { headers: h });
@@ -26,8 +25,31 @@ export default async function handler(req, res) {
     } catch(e) { return []; }
   }
 
+  // Extract relevant snippets from transcript text around search terms
+  function getTranscriptSnippets(text, searchWords, maxSnippets) {
+    if (!text || !searchWords.length) return "";
+    var lines = text.split("\n");
+    var snippets = [];
+    var maxS = maxSnippets || 8;
+    for (var i = 0; i < lines.length && snippets.length < maxS; i++) {
+      var line = lines[i];
+      var lineLower = line.toLowerCase();
+      for (var j = 0; j < searchWords.length; j++) {
+        if (lineLower.indexOf(searchWords[j]) !== -1 && line.length > 20) {
+          // Grab this line plus 2 lines of context
+          var snippet = "";
+          if (i > 0) snippet += lines[i-1] + "\n";
+          snippet += line + "\n";
+          if (i + 1 < lines.length) snippet += lines[i+1];
+          snippets.push(snippet.trim());
+          break;
+        }
+      }
+    }
+    return snippets.join("\n---\n");
+  }
+
   try {
-    // Build search terms
     var stopList = "the a an and or but in on at to for of with by from is was are were been has have had do does did will would could should may might can how what when where who which that this these those about most recent last latest first all any each every many much some more other into";
     var stop = {};
     stopList.split(" ").forEach(function(w) { stop[w] = true; });
@@ -35,10 +57,44 @@ export default async function handler(req, res) {
     var sq = words.join("+");
     var base = SUPABASE_URL + "/rest/v1/";
 
-    // ===== 1. MEETINGS (recent + search) =====
+    // 1. Recent meetings
     var recentMeetings = await safeFetch(base + "meetings?select=id,date,meeting_type,title,topics,extracted_data&order=date.desc&limit=10");
+
+    // 2. FTS meetings
     var searchMeetings = [];
     if (sq) { searchMeetings = await safeFetch(base + "meetings?select=id,date,meeting_type,title,topics,extracted_data&fts=fts." + encodeURIComponent(sq) + "&order=date.desc&limit=15"); }
+
+    // 3. FTS votes
+    var votes = [];
+    if (sq) { votes = await safeFetch(base + "votes?select=meeting_date,motion_text,result,vote_yes,vote_no,vote_abstain,vote_absent,topic_tags&fts=fts." + encodeURIComponent(sq) + "&order=meeting_date.desc&limit=20"); }
+
+    // 4. FTS decisions
+    var decisions = [];
+    if (sq) { decisions = await safeFetch(base + "decisions?select=meeting_date,description,category,dollar_amount,topic_tags&fts=fts." + encodeURIComponent(sq) + "&order=meeting_date.desc&limit=20"); }
+
+    // 5. Budget documents (recent + search)
+    var recentBudget = await safeFetch(base + "budget_documents?select=fiscal_year,title,doc_type,total_revenue,total_expenditures,personnel_costs,personnel_cost_percentage,fund_balance,enrollment_ftes,key_findings&order=fiscal_year.desc&limit=5");
+    var searchBudget = [];
+    if (sq) { searchBudget = await safeFetch(base + "budget_documents?select=fiscal_year,title,doc_type,total_revenue,total_expenditures,personnel_costs,personnel_cost_percentage,fund_balance,enrollment_ftes,key_findings,extracted_data&fts=fts." + encodeURIComponent(sq) + "&order=fiscal_year.desc&limit=10"); }
+
+    // 6. Policy documents
+    var policyDocs = [];
+    if (sq) { policyDocs = await safeFetch(base + "policy_documents?select=source,title,document_type,summary,impact_on_community_colleges,impact_on_smc,key_provisions,funding_implications,related_programs,topic_tags&fts=fts." + encodeURIComponent(sq) + "&order=created_at.desc&limit=10"); }
+
+    // 7. Transcript search — pull raw_minutes_text for FTS-matching meetings
+    var transcriptSnippets = [];
+    if (sq) {
+      var transcriptMeetings = await safeFetch(base + "meetings?select=date,meeting_type,raw_minutes_text&fts=fts." + encodeURIComponent(sq) + "&order=date.desc&limit=5&raw_minutes_text=not.is.null");
+      for (var i = 0; i < transcriptMeetings.length; i++) {
+        var tm = transcriptMeetings[i];
+        if (tm.raw_minutes_text && tm.raw_minutes_text.indexOf("AUDIO TRANSCRIPT") !== -1) {
+          var snippets = getTranscriptSnippets(tm.raw_minutes_text, words, 6);
+          if (snippets) {
+            transcriptSnippets.push({ date: tm.date, meeting_type: tm.meeting_type, snippets: snippets });
+          }
+        }
+      }
+    }
 
     // Deduplicate meetings
     var seenM = {};
@@ -50,19 +106,6 @@ export default async function handler(req, res) {
     }
     allMeetings.sort(function(a, b) { return b.date.localeCompare(a.date); });
 
-    // ===== 2. VOTES (search) =====
-    var votes = [];
-    if (sq) { votes = await safeFetch(base + "votes?select=meeting_date,motion_text,result,vote_yes,vote_no,vote_abstain,vote_absent,topic_tags&fts=fts." + encodeURIComponent(sq) + "&order=meeting_date.desc&limit=20"); }
-
-    // ===== 3. DECISIONS (search) =====
-    var decisions = [];
-    if (sq) { decisions = await safeFetch(base + "decisions?select=meeting_date,description,category,dollar_amount,topic_tags&fts=fts." + encodeURIComponent(sq) + "&order=meeting_date.desc&limit=20"); }
-
-    // ===== 4. BUDGET DOCUMENTS (recent + search) =====
-    var recentBudget = await safeFetch(base + "budget_documents?select=fiscal_year,title,doc_type,total_revenue,total_expenditures,personnel_costs,personnel_cost_percentage,fund_balance,enrollment_ftes,key_findings&order=fiscal_year.desc&limit=5");
-    var searchBudget = [];
-    if (sq) { searchBudget = await safeFetch(base + "budget_documents?select=fiscal_year,title,doc_type,total_revenue,total_expenditures,personnel_costs,personnel_cost_percentage,fund_balance,enrollment_ftes,key_findings,extracted_data&fts=fts." + encodeURIComponent(sq) + "&order=fiscal_year.desc&limit=10"); }
-
     // Deduplicate budget
     var seenB = {};
     var allBudget = [];
@@ -72,13 +115,9 @@ export default async function handler(req, res) {
       if (!seenB[bk]) { seenB[bk] = true; allBudget.push(combinedB[i]); }
     }
 
-    // ===== 5. POLICY DOCUMENTS (search) =====
-    var policyDocs = [];
-    if (sq) { policyDocs = await safeFetch(base + "policy_documents?select=source,title,document_type,summary,impact_on_community_colleges,impact_on_smc,key_provisions,funding_implications,related_programs,topic_tags&fts=fts." + encodeURIComponent(sq) + "&order=created_at.desc&limit=10"); }
-
-    // ===== BUILD CONTEXT =====
+    // BUILD CONTEXT
     var context = "SANTA MONICA COLLEGE — CIVICLENS DATABASE\n";
-    context += "Contains: 349 board meetings (1998-2026), 2,656 votes, 9,819 decisions, 72 budget reports, 33+ policy documents (CA bills, CCCCO memos, EDGE publications).\n\n";
+    context += "Contains: 349 board meetings (1998-2026), 2,656 votes, 9,819 decisions, 72 budget reports, 47+ policy documents, 12 audio-transcribed meetings (Feb 2025-Mar 2026).\n\n";
 
     // Meetings
     if (allMeetings.length > 0) {
@@ -176,14 +215,21 @@ export default async function handler(req, res) {
           context += "  Provisions: " + p.key_provisions.join("; ") + "\n";
         }
         if (p.funding_implications) context += "  Funding: " + p.funding_implications + "\n";
-        if (p.related_programs && p.related_programs.length) {
-          context += "  Programs: " + p.related_programs.join(", ") + "\n";
-        }
       }
     }
 
-    // ===== GEMINI =====
-    var systemPrompt = "You are CivicLens, a civic transparency AI for Santa Monica College. You answer questions using ONLY the data provided below, which includes board meeting records, vote histories, budget reports, and California policy documents.\n\nRULES:\n- Cite specific meeting dates, budget fiscal years, or bill numbers for every claim.\n- Include trustee vote breakdowns when available.\n- When discussing budget, include dollar amounts and percentages.\n- When discussing state policy, explain how the bill or memo affects SMC specifically.\n- If data is insufficient, say so honestly and suggest what to search for.\n- Current trustees (Dec 2025-Dec 2026): Chair Dr. Sion Roy, Vice Chair Dr. Tom Peters, Dr. Nancy Greenstein, Dr. Margaret Quinones-Perez, Dr. Luis Barrera Castanon (appointed Feb 2025), Rob Rader, Anastasia Foster (elected Nov 2024).\n- Write in plain text paragraphs. Do NOT use markdown like ** or ## or bullet points. Keep your answer under 300 words — be specific and cite numbers, but be concise.\n- End with a line listing the sources referenced (meeting dates, budget documents, or bill numbers).\n\n" + context;
+    // Audio transcript snippets
+    if (transcriptSnippets.length > 0) {
+      context += "\n=== AUDIO TRANSCRIPT EXCERPTS (speaker-attributed from meeting recordings) ===\n";
+      for (var i = 0; i < transcriptSnippets.length; i++) {
+        var ts = transcriptSnippets[i];
+        context += "\nMeeting: " + ts.date + " (" + ts.meeting_type + ") — from audio recording:\n";
+        context += ts.snippets + "\n";
+      }
+    }
+
+    // GEMINI
+    var systemPrompt = "You are CivicLens, a civic transparency AI for Santa Monica College. You answer questions using ONLY the data provided below, which includes board meeting records, vote histories, budget reports, California policy documents, and speaker-attributed audio transcripts from board meetings.\n\nRULES:\n- Cite specific meeting dates, budget fiscal years, or bill numbers for every claim.\n- Include trustee vote breakdowns when available.\n- When discussing budget, include dollar amounts and percentages.\n- When discussing state policy, explain how the bill or memo affects SMC specifically.\n- When audio transcript excerpts are available, use them to provide direct quotes from trustees and speakers. Attribute quotes to the speaker by name.\n- If data is insufficient, say so honestly and suggest what to search for.\n- Current trustees (Dec 2025-Dec 2026): Chair Dr. Sion Roy, Vice Chair Dr. Tom Peters, Dr. Nancy Greenstein, Dr. Margaret Quinones-Perez, Dr. Luis Barrera Castanon (appointed Feb 2025), Rob Rader, Anastasia Foster (elected Nov 2024).\n- Write in plain text paragraphs. Do NOT use markdown like ** or ## or bullet points.\n- Keep your answer under 300 words — be specific and cite numbers, but be concise.\n- End with a line listing the sources referenced (meeting dates, budget documents, or bill numbers).\n\n" + context;
 
     var geminiRes = await fetch(
       "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" + GEMINI_KEY,
@@ -213,7 +259,8 @@ export default async function handler(req, res) {
         votes_found: votes.length,
         decisions_found: decisions.length,
         budget_docs_found: allBudget.length,
-        policy_docs_found: policyDocs.length
+        policy_docs_found: policyDocs.length,
+        transcript_snippets: transcriptSnippets.length
       }
     });
 
