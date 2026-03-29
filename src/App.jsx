@@ -243,7 +243,7 @@ function Priorities() {
   const [exp, setExp] = useState(null);
   const [ref, vis] = useInView();
   const items = [
-    { icon: "📊", title: "Fiscal Accountability & SCFF Alignment", summary: "SMC has been on fiscal life support for 7 years. This is not my opinion, it is written in the budget presentations across every year.", detail: "SMC has operated under the state's Hold Harmless provision since 2018 — meaning the college doesn't generate enough student success outcomes to earn its funding through the Student-Centered Funding Formula. When this protection expires, SMC faces a ~$17 million annual shortfall. Meanwhile, 91.4% of discretionary spending goes to personnel costs. While $0 goes to workforce development and upskilling form our general fund. I'm pushing for an SCFF gap analysis and alignment, outcome-based budgeting, and a dedicated workforce investment and strategy." },
+    { icon: "📊", title: "Fiscal Accountability & SCFF Alignment", summary: "SMC has been on fiscal life support for 7 years. This is not my opinion, it is written in the budget presentations across every year.", detail: "SMC has operated under the state's Hold Harmless provision since 2018 — meaning the college doesn't generate enough student success outcomes to earn its funding through the Student-Centered Funding Formula. When this protection expires, SMC faces a ~$17 million annual shortfall. Meanwhile, 91.4% of discretionary spending goes to personnel costs. While $0 goes to workforce development and upskilling from our general fund. I'm pushing for an SCFF gap analysis and alignment, outcome-based budgeting, and a dedicated workforce investment and strategy." },
     { icon: "🎓", title: "Student Success as Revenue Strategy", summary: "Investing in students isn't just right — it's how the college gets funded.", detail: "Under the SCFF, California rewards colleges for completions, transfers, and living wage attainment. The moral case and the fiscal case are the same case. I'm advocating for a strategic institutional focus on Career Pathways, expanding career technical education, investing in professional development, and creating clear pathways from enrollment to living-wage employment." },
     { icon: "🛡️", title: "Campus Safety & Workplace Culture", summary: "After the October 2024 on-campus murder, safety and trust must be rebuilt.", detail: "The workplace violence incident of October 14, 2024 exposed critical gaps — non-functional security cameras, inadequate lighting, inconsistent emergency training. Staff morale is at a low point. Throughout my career, I built trust through clear staffing plans, realistic organizational goals, and transparent communication. SMC needs the same systematic approach." },
     { icon: "💼", title: "Workforce Alignment & Regional Partnerships", summary: "SMC's general fund budget shows zero strategy connecting students to living-wage careers.", detail: "Living wage attainment is a state funding metric — yet SMC has no identifiable general fund budget investments in career services, employer engagement, or post-completion wage tracking. I'm advocating for regional workforce alignment, expanded work-based learning, and sector-based partnerships that tie directly to the state funding formula." },
@@ -420,7 +420,7 @@ function Record() {
                 fontFamily: "'Source Sans 3', sans-serif", fontSize: 15
               }}>
                 <span style={{ display: "inline-block", animation: "pulse 1.5s infinite" }}>
-                  Searching 349 meetings and 2,656 votes...
+                  Searching 349 meetings, 2,656 votes, and 47 policy documents...
                 </span>
               </div>
             )}
@@ -484,7 +484,9 @@ function Record() {
               {[
                 { value: "349", label: "Board meetings indexed", sub: "1998 – 2026" },
                 { value: "2,656", label: "Votes tracked", sub: "Every trustee, every vote" },
-                { value: "9,819", label: "Decisions cataloged", sub: "Budget, policy, personnel" }
+                { value: "9,819", label: "Decisions cataloged", sub: "Budget, policy, personnel" },
+                { value: "72", label: "Budget reports analyzed", sub: "Quarterly & adopted budgets" },
+                { value: "47", label: "Policy documents indexed", sub: "CA bills, CCCCO, analysis" }
               ].map((s, i) => (
                 <div key={i} className="record-stat">
                   <div className="stat-num-sm">{s.value}</div>
@@ -712,8 +714,8 @@ function Espanol() {
             Soy Fundador y CEO de EmpathySystem.ai, una empresa de bases de datos con inteligencia 
             artificial para los sectores de salud y organizaciones sin fines de lucro. Usé ese conocimiento 
             técnico para construir CivicLens — un sistema de preguntas y respuestas que indexa 
-            349 reuniones del Consejo de Administración de SMC desde 1998, rastreando 2,656 votos y 
-            9,819 decisiones. Cada respuesta está basada en documentos reales del Consejo con 
+            349 reuniones del Consejo de Administración de SMC desde 1998, rastreando 2,656 votos, 
+            9,819 decisiones, 72 informes presupuestarios y 47 documentos de política estatal. Cada respuesta está basada en documentos reales del Consejo con 
             citas específicas. Ningún candidato ha hecho esto antes. ¡Esto es transparencia!
           </p>
         </div>
@@ -921,7 +923,7 @@ export default function App() {
         .search-preview{background:rgba(250,247,242,0.05);border-radius:8px;padding:16px 20px;display:flex;align-items:center;gap:12px;border:1px solid rgba(250,247,242,0.06);margin-bottom:24px}
         .search-preview span{font-family:'Source Sans 3',sans-serif;font-size:15px;color:rgba(250,247,242,0.22)}
         .civiclens-desc{font-family:'Source Serif 4',serif;font-size:15px;color:rgba(250,247,242,0.5);line-height:1.7;margin:0 0 24px}
-        .record-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+        .record-stats{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
         .record-stat{background:rgba(250,247,242,0.035);border-radius:6px;padding:16px 18px}
         .stat-num-sm{font-family:'DM Serif Display',serif;font-size:clamp(20px,2.2vw,28px);color:#F7CF3D;line-height:1}
         .stat-label-sm{font-family:'Source Sans 3',sans-serif;font-size:12px;color:rgba(250,247,242,0.45);margin-top:6px}
