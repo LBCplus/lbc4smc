@@ -275,7 +275,7 @@ function Priorities() {
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <h3 className="priority-title">{p.title}</h3>
                   <p className="priority-summary">{p.summary}</p>
-                  <div className="priority-detail-wrap" style={{ maxHeight: exp === i ? 320 : 0 }}>
+                  <div className="priority-detail-wrap" style={{ maxHeight: exp === i ? 800 : 0 }}>
                     <p className="priority-detail">{p.detail}</p>
                   </div>
                 </div>
@@ -506,15 +506,13 @@ function Community() {
   const [ref, vis] = useInView();
   const roles = [
     { org: "SMC Board of Trustees", role: "Trustee (Appointed Feb 2025)", c: true },
-    { org: "EmpathySystem.ai", role: "Founder & CEO", c: true },
-    { org: "LBC+ Consulting & Creative", role: "President & CEO", c: true },
-    { org: "SMC General Advisory Board", role: "Member", c: true },
-    { org: "SMC Citizens' Bond Oversight", role: "Committee Member", c: true },
+    { org: "SMC General Advisory Board", role: "Past Member", c: false },
+    { org: "SMC Citizens' Bond Oversight", role: "Past Member", c: false },
     { org: "City of SM Human Services Commission", role: "Former Vice Chair", c: false },
-    { org: "Santa Monica Democratic Club", role: "Treasurer, Exec Board", c: true },
+    { org: "Santa Monica Democratic Club", role: "Active Member, past Executive Board Member", c: true },
     { org: "SMC Young Alumni Council", role: "Founding Board Member", c: false },
     { org: "SM for Renters' Rights", role: "Active Member", c: true },
-    { org: "Wilshire Montana Neighborhood Coalition", role: "Active Member", c: true },
+    { org: "Wilshire Montana Neighborhood Coalition", role: "Member", c: true },
     { org: "House of Haven", role: "Past Chair, Current Board Member", c: true },
     { org: "Raza Golf Foundation", role: "Board Member", c: true },
   ];
@@ -689,7 +687,7 @@ function Espanol() {
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <h3 className="priority-title">{p.title}</h3>
                   <p className="priority-summary">{p.summary}</p>
-                  <div className="priority-detail-wrap" style={{ maxHeight: exp === i ? 320 : 0 }}>
+                  <div className="priority-detail-wrap" style={{ maxHeight: exp === i ? 800 : 0 }}>
                     <p className="priority-detail">{p.detail}</p>
                   </div>
                 </div>
