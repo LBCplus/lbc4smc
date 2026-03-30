@@ -626,7 +626,7 @@ function Espanol() {
         </h2>
 
         <div style={{ margin: "24px 0 32px", textAlign: "center" }}>
-          <img src="/images/family-selfie.jpeg" alt="Luis con su familia" style={{
+          <img src="/images/unidos-us-conference.jpeg" alt="Luis en conferencia de UnidosUS" style={{
             width: "100%", maxWidth: 460, borderRadius: 10, display: "inline-block"
           }} />
         </div>
@@ -755,6 +755,40 @@ function Espanol() {
 
 function Join() {
   const [ref, vis] = useInView();
+  const [form, setForm] = useState({ name: "", email: "", zip: "" });
+  const [interests, setInterests] = useState([]);
+  const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+
+  const toggleInterest = (val) => {
+    setInterests(prev => prev.includes(val) ? prev.filter(v => v !== val) : [...prev, val]);
+  };
+
+  const handleSubmit = async () => {
+    if (!form.email || submitting) return;
+    setSubmitting(true);
+    try {
+      var res = await fetch("/api/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: form.name, email: form.email, zip: form.zip, interests: interests })
+      });
+      if (res.ok) {
+        setSubmitted(true);
+      }
+    } catch(e) {}
+    setSubmitting(false);
+  };
+
+  const inputStyle = {
+    width: "100%", padding: "14px 16px", borderRadius: 8,
+    border: "1px solid rgba(0,58,117,0.15)", background: "#fff",
+    fontFamily: "'Source Sans 3', sans-serif", fontSize: 15,
+    color: "#001838", outline: "none", boxSizing: "border-box"
+  };
+
+  const interestOptions = ["Volunteer", "Endorse", "Door-to-door canvassing", "Phone banking", "Social media", "Host an event"];
+
   return (
     <section id="join" style={{ background: "#FAF7F2", padding: "100px 24px" }}>
       <div ref={ref} style={{ maxWidth: 780, margin: "0 auto", textAlign: "center" }}>
@@ -764,24 +798,128 @@ function Join() {
           Whether you're an SMC student, alumnus, parent, faculty member, or community 
           resident — your voice matters.
         </p>
-        <div className="join-grid">
-          {[
-            { label: "Volunteer", desc: "Canvass, phone bank, or help organize community events", icon: "🤝" },
-            { label: "Endorse", desc: "Add your name and stand with transparent governance", icon: "✍️" },
-            { label: "Spread the Word", desc: "Share this site with your neighbors and networks", icon: "📣" }
-          ].map((item, i) => (
-            <div key={i} className="join-card" style={{
-              opacity: vis ? 1 : 0,
-              transform: vis ? "translateY(0)" : "translateY(12px)",
-              transition: `all 0.5s ease ${i * 0.1}s`
-            }}>
-              <div style={{ fontSize: 34, marginBottom: 14 }}>{item.icon}</div>
-              <h4 className="join-title">{item.label}</h4>
-              <p className="join-desc">{item.desc}</p>
-            </div>
-          ))}
+
+        {/* Donate Button - Coming Soon */}
+        <div style={{
+          background: "#003A75", borderRadius: 10, padding: "32px",
+          marginBottom: 40, opacity: vis ? 1 : 0,
+          transform: vis ? "translateY(0)" : "translateY(12px)",
+          transition: "all 0.5s ease"
+        }}>
+          <div style={{
+            fontFamily: "'DM Serif Display', serif", fontSize: 26,
+            color: "#FAF7F2", marginBottom: 8
+          }}>Support This Campaign</div>
+          <p style={{
+            fontFamily: "'Source Sans 3', sans-serif", fontSize: 15,
+            color: "rgba(250,247,242,0.6)", marginBottom: 20, lineHeight: 1.5
+          }}>
+            Donations will be accepted through ActBlue once campaign paperwork is filed with the State of California.
+          </p>
+          <div style={{
+            display: "inline-block", padding: "14px 36px", borderRadius: 8,
+            background: "rgba(247,207,61,0.15)", border: "2px solid rgba(247,207,61,0.3)",
+            fontFamily: "'Source Sans 3', sans-serif", fontSize: 15,
+            fontWeight: 700, color: "#F7CF3D", letterSpacing: "0.04em",
+            textTransform: "uppercase"
+          }}>
+            Donate — Coming Soon
+          </div>
         </div>
-        <a href="mailto:LBC4SMC@gmail.com" className="btn-dark" style={{ marginTop: 44, display: "inline-block" }}>
+
+        {/* Signup Form */}
+        {submitted ? (
+          <div style={{
+            background: "#003A75", borderRadius: 10, padding: "40px 32px",
+            opacity: vis ? 1 : 0, transition: "all 0.5s ease 0.1s"
+          }}>
+            <div style={{ fontSize: 40, marginBottom: 12 }}>✊</div>
+            <div style={{
+              fontFamily: "'DM Serif Display', serif", fontSize: 24,
+              color: "#FAF7F2", marginBottom: 8
+            }}>Thank you!</div>
+            <p style={{
+              fontFamily: "'Source Serif 4', serif", fontSize: 16,
+              color: "rgba(250,247,242,0.7)", lineHeight: 1.6
+            }}>
+              You're part of the movement. We'll be in touch as the campaign ramps up.
+            </p>
+          </div>
+        ) : (
+          <div style={{
+            background: "#fff", borderRadius: 10, padding: "36px 32px",
+            border: "1px solid rgba(0,58,117,0.08)", textAlign: "left",
+            opacity: vis ? 1 : 0,
+            transform: vis ? "translateY(0)" : "translateY(12px)",
+            transition: "all 0.5s ease 0.1s"
+          }}>
+            <div style={{
+              fontFamily: "'DM Serif Display', serif", fontSize: 22,
+              color: "#003A75", marginBottom: 4
+            }}>Join the Campaign</div>
+            <p style={{
+              fontFamily: "'Source Sans 3', sans-serif", fontSize: 14,
+              color: "#646469", marginBottom: 24, lineHeight: 1.5
+            }}>
+              Sign up to volunteer, endorse, or stay informed.
+            </p>
+
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 12 }}>
+              <input type="text" placeholder="Your name" value={form.name}
+                onChange={e => setForm({...form, name: e.target.value})}
+                style={inputStyle} />
+              <input type="text" placeholder="Zip code" value={form.zip}
+                onChange={e => setForm({...form, zip: e.target.value})}
+                style={inputStyle} />
+            </div>
+            <input type="email" placeholder="Email address *" value={form.email}
+              onChange={e => setForm({...form, email: e.target.value})}
+              onKeyDown={e => e.key === "Enter" && handleSubmit()}
+              style={{ ...inputStyle, marginBottom: 20 }} />
+
+            <div style={{ marginBottom: 20 }}>
+              <div style={{
+                fontFamily: "'Source Sans 3', sans-serif", fontSize: 13,
+                color: "#646469", marginBottom: 10, fontWeight: 600
+              }}>I want to:</div>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                {interestOptions.map((opt, i) => (
+                  <button key={i} onClick={() => toggleInterest(opt)}
+                    style={{
+                      padding: "8px 16px", borderRadius: 20,
+                      border: interests.includes(opt) ? "2px solid #003A75" : "1px solid rgba(0,58,117,0.15)",
+                      background: interests.includes(opt) ? "rgba(0,58,117,0.06)" : "transparent",
+                      fontFamily: "'Source Sans 3', sans-serif", fontSize: 13,
+                      color: interests.includes(opt) ? "#003A75" : "#646469",
+                      fontWeight: interests.includes(opt) ? 700 : 400,
+                      cursor: "pointer", transition: "all 0.2s"
+                    }}
+                  >{opt}</button>
+                ))}
+              </div>
+            </div>
+
+            <button onClick={handleSubmit} disabled={!form.email || submitting}
+              style={{
+                width: "100%", padding: "16px", borderRadius: 8, border: "none",
+                background: form.email ? "#003A75" : "#B4B2A9",
+                color: "#FAF7F2", fontFamily: "'Source Sans 3', sans-serif",
+                fontSize: 16, fontWeight: 700, letterSpacing: "0.04em",
+                textTransform: "uppercase", cursor: form.email ? "pointer" : "default",
+                transition: "background 0.2s"
+              }}
+            >{submitting ? "Signing up..." : "Count Me In →"}</button>
+
+            <p style={{
+              fontFamily: "'Source Sans 3', sans-serif", fontSize: 12,
+              color: "#B4B2A9", marginTop: 12, textAlign: "center", lineHeight: 1.4
+            }}>
+              Your information is kept private and will only be used for campaign communications.
+            </p>
+          </div>
+        )}
+
+        <a href="mailto:LBC4SMC@gmail.com" className="btn-dark" style={{ marginTop: 32, display: "inline-block" }}>
           Contact the Campaign →
         </a>
       </div>
