@@ -197,7 +197,7 @@ function Story() {
                 <div className="story-photos" style={{
                   opacity: vis ? 1 : 0, transition: "opacity 0.8s ease 0.5s"
                 }}>
-                  <img src="/images/smc-associated-students-2001.jpeg" alt="Associated Students at Santa Monica College, 2001" className="story-photo" style={{ gridColumn: "1 / -1" }} />
+                  <img src="/images/smc-associated-students-2000.png" alt="Associated Students at Santa Monica College, 2000" className="story-photo" style={{ gridColumn: "1 / -1" }} />
                   <img src="/images/smc-as-vp-office.jpeg" alt="In the A.S. Vice President office at Santa Monica College" className="story-photo story-photo-tall" />
                   <img src="/images/smc-speaking-2002.jpeg" alt="Speaking at Festival of Sacred Music, Los Angeles, 2002" className="story-photo story-photo-tall" />
                 </div>
@@ -561,7 +561,7 @@ function Community() {
 
         <h3 className="subsection-heading">Professional Experience</h3>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 16 }}>
-          <img src="/images/smart-on-justice.jpeg" alt="Smart on Justice initiative at the California Department of Justice" style={{
+          <img src="/images/smart-on-crime-award.jpeg" alt="Receiving Smart on Crime award at the California Attorney General's Office" style={{
             width: "100%", borderRadius: 8, objectFit: "cover"
           }} />
           <img src="/images/obama-inauguration-2008.jpeg" alt="At the 2008 Presidential Inauguration in Washington, D.C." style={{
