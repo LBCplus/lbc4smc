@@ -349,7 +349,7 @@ function Record() {
         <p className="section-intro dark">
           Every vote I've cast since my appointment in February 2025 is public record. 
           Search, filter, and explore the complete voting history of every SMC trustee — 
-          powered by CivicLens, an open-source civic transparency platform which I designed, built and launched.
+          powered by MyLocalBoard, an open-source civic transparency platform which I designed, built and launched.
         </p>
 
         <div className="civiclens-card" style={{
@@ -361,7 +361,7 @@ function Record() {
           <div style={{ position: "relative" }}>
             <div className="civiclens-status">
               <div className="status-dot" style={{ background: "#4ade80", boxShadow: "0 0 8px rgba(74,222,128,0.6)" }} />
-              <span>CivicLens · Live</span>
+              <span>MyLocalBoard · Live</span>
             </div>
 
             {/* Search Input */}
@@ -478,6 +478,7 @@ function Record() {
               public meeting records and makes them searchable in plain language. Every answer is 
               grounded in actual board documents with specific citations — dates, vote 
               counts, and full context. No candidate has ever done this before.
+              Learn more at <a href="https://mylocalboard.com" target="_blank" rel="noopener" style={{ color: "#F7CF3D" }}>MyLocalBoard.com</a>.
             </p>
 
             <div className="record-stats">
@@ -718,7 +719,7 @@ function Espanol() {
           }}>
             Soy Fundador y Dueño de EmpathySystem.ai, una empresa de inteligencia 
             artificial para los sectores de salud y organizaciones sin fines de lucro. Usé ese conocimiento 
-            técnico para construir CivicLens — un sistema de preguntas y respuestas que indexa 
+            técnico para construir MyLocalBoard — un sistema de preguntas y respuestas que indexa 
             349 reuniones del Consejo de Administración del colegio desde 1998, rastreando 2,656 votos, 
             9,819 decisiones, 72 informes presupuestarios y 47 documentos de política estatal. 
             Cada respuesta está basada en documentos reales del Consejo con 
@@ -949,7 +950,7 @@ function Footer() {
         </div>
         <div className="footer-legal">
           Paid for by Luis Barrera Castañón for SMC Board of Trustees 2026 (pending campaign filing).<br />
-          Transparency powered by <span style={{ color: "rgba(247, 207, 61, 0.5)" }}>CivicLens</span>, an open-source civic transparency platform. © 2026
+          Transparency powered by <span style={{ color: "rgba(247, 207, 61, 0.5)" }}>MyLocalBoard</span>, an open-source civic transparency platform. © 2026
         </div>
       </div>
     </footer>
