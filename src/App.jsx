@@ -478,7 +478,6 @@ function Record() {
               public meeting records and makes them searchable in plain language. Every answer is 
               grounded in actual board documents with specific citations — dates, vote 
               counts, and full context. No candidate has ever done this before.
-              Learn more at <a href="https://mylocalboard.com" target="_blank" rel="noopener" style={{ color: "#F7CF3D" }}>MyLocalBoard.com</a>.
             </p>
 
             <div className="record-stats">
@@ -507,7 +506,7 @@ function Community() {
   const [ref, vis] = useInView();
   const roles = [
     { org: "SMC Board of Trustees", role: "Trustee (Appointed Feb 2025)", c: true },
-    { org: "SMC General Advisory Board", role: "Past Member", c: false },
+    { org: "SMC General Advisory Board", role: "Member", c: true },
     { org: "SMC Citizens' Bond Oversight", role: "Past Member", c: false },
     { org: "City of SM Human Services Commission", role: "Former Vice Chair", c: false },
     { org: "Santa Monica Democratic Club", role: "Active Member, past Executive Board Member", c: true },
