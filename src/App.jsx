@@ -487,8 +487,9 @@ function Record() {
                 { value: "349", label: "Board meetings indexed", sub: "1998 – 2026" },
                 { value: "2,656", label: "Votes tracked", sub: "Every trustee, every vote" },
                 { value: "9,819", label: "Decisions cataloged", sub: "Budget, policy, personnel" },
+                { value: "46,518", label: "CA bills indexed", sub: "607 community college-relevant" },
                 { value: "72", label: "Budget reports analyzed", sub: "Quarterly & adopted budgets" },
-                { value: "47", label: "Policy documents indexed", sub: "CA bills, CCCCO, analysis" }
+                { value: "47", label: "Policy documents indexed", sub: "CCCCO, analysis, memos" }
               ].map((s, i) => (
                 <div key={i} className="record-stat">
                   <div className="stat-num-sm">{s.value}</div>
