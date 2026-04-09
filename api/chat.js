@@ -60,7 +60,7 @@ export default async function handler(req, res) {
       }
     }
 
-    var ccLegislation = await safeFetch(base + "legislation?select=bill_number,session,title,status,signed_date,impact_assessment&is_cc_relevant=eq.true&status=eq.signed&impact_assessment=not.is.null&order=signed_date.desc.nullslast&limit=10");
+    var ccLegislation = await safeFetch(base + "legislation?select=bill_number,session,title,status,signed_date,impact_assessment&is_cc_relevant=eq.true&status=eq.signed&impact_assessment=not.is.null&order=signed_date.desc.nullslast&limit=25");
     var enrollmentData = await safeFetch(base + "enrollment_data?select=academic_year,metric,value,unit,source&college=eq.Santa Monica College&order=academic_year.desc&limit=50");
 
     // === MERGE AND DEDUPLICATE ===
