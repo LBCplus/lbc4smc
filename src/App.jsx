@@ -335,9 +335,11 @@ function Record() {
   };
 
   const sampleQuestions = [
-    "How has the board voted on campus safety since 2024?",
-    "What workforce development decisions has the board made?",
-    "How did trustees vote on the annual budget?",
+    "Why is SMC on Hold Harmless?",
+    "What is the Student-Centered Funding Formula?",
+    "How has enrollment changed at SMC since 2017?",
+    "What legislation created the Strong Workforce Program?",
+    "How much does SMC spend on personnel vs. workforce development?",
     "What has Dr. Barrera Castañón voted on since joining?",
   ];
 
@@ -371,7 +373,7 @@ function Record() {
                 value={query}
                 onChange={e => setQuery(e.target.value)}
                 onKeyDown={e => e.key === "Enter" && askQuestion()}
-                placeholder="Ask about any board decision, vote, or policy..."
+                placeholder="Ask about any board decision, vote, budget, legislation, or policy impact..."
                 style={{
                   flex: 1, padding: "14px 18px", borderRadius: 8,
                   border: "1px solid rgba(250,247,242,0.15)",
@@ -420,7 +422,7 @@ function Record() {
                 fontFamily: "'Source Sans 3', sans-serif", fontSize: 15
               }}>
                 <span style={{ display: "inline-block", animation: "pulse 1.5s infinite" }}>
-                  Searching 349 meetings, 2,656 votes, and 47 policy documents...
+                  Searching 349 meetings, 2,656 votes, 46,518 CA bills, and 47 policy documents...
                 </span>
               </div>
             )}
@@ -720,7 +722,7 @@ function Espanol() {
             artificial para los sectores de salud y organizaciones sin fines de lucro. Usé ese conocimiento 
             técnico para construir MyLocalBoard — un sistema de preguntas y respuestas que indexa 
             349 reuniones del Consejo de Administración del colegio desde 1998, rastreando 2,656 votos, 
-            9,819 decisiones, 72 informes presupuestarios y 47 documentos de política estatal. 
+            9,819 decisiones, 72 informes presupuestarios, 47 documentos de política estatal, y 46,518 proyectos de ley de California indexados. 
             Cada respuesta está basada en documentos reales del Consejo con 
             citas específicas. Ningún candidato ha hecho esto antes. ¡Esto es transparencia!
           </p>
