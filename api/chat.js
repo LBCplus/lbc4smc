@@ -145,7 +145,7 @@ export default async function handler(req, res) {
     var geminiRes = await fetch(
       "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" + GEMINI_KEY,
       { method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ contents: [{ role: "user", parts: [{ text: question }] }], systemInstruction: { parts: [{ text: systemPrompt }] }, generationConfig: { temperature: 0.3, maxOutputTokens: 4096 } })
+        body: JSON.stringify({ contents: [{ role: "user", parts: [{ text: question }] }], systemInstruction: { parts: [{ text: systemPrompt }] }, generationConfig: { temperature: 0.3, maxOutputTokens: 8192 } })
       }
     );
     var geminiData = await geminiRes.json();
