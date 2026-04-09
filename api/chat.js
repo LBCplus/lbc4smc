@@ -82,7 +82,7 @@ export default async function handler(req, res) {
 
     // === BUILD CONTEXT ===
     var context = "SANTA MONICA COLLEGE BOARD OF TRUSTEES — CIVIC TRANSPARENCY DATA\n";
-    context += "Database: 349 meetings (1998-2026), 2,656 votes, 9,819 decisions, 72 budget documents, 46,518 CA bills indexed (5,338 education, 607 CC-relevant with impact assessments).\n\n";
+    context += "Database: 448 meetings (1998-2026), 5,430 votes, 20,019 decisions, 72 budget documents, 46,518 CA bills indexed (5,338 education, 607 CC-relevant with impact assessments).\n\n";
 
     if (allMeetings.length > 0) {
       context += "=== MEETINGS ===\n";

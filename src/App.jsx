@@ -422,7 +422,7 @@ function Record() {
                 fontFamily: "'Source Sans 3', sans-serif", fontSize: 15
               }}>
                 <span style={{ display: "inline-block", animation: "pulse 1.5s infinite" }}>
-                  Searching 349 meetings, 2,656 votes, 46,518 CA bills, and 47 policy documents...
+                  Searching 448 meetings, 5,430 votes, 46,518 CA bills, and 47 policy documents...
                 </span>
               </div>
             )}
@@ -484,9 +484,9 @@ function Record() {
 
             <div className="record-stats">
               {[
-                { value: "349", label: "Board meetings indexed", sub: "1998 – 2026" },
-                { value: "2,656", label: "Votes tracked", sub: "Every trustee, every vote" },
-                { value: "9,819", label: "Decisions cataloged", sub: "Budget, policy, personnel" },
+                { value: "448", label: "Board meetings indexed", sub: "1998 – 2026" },
+                { value: "5,430", label: "Votes tracked", sub: "Every trustee, every vote" },
+                { value: "20,019", label: "Decisions cataloged", sub: "Budget, policy, personnel" },
                 { value: "46,518", label: "CA bills indexed", sub: "607 community college-relevant" },
                 { value: "72", label: "Budget reports analyzed", sub: "Quarterly & adopted budgets" },
                 { value: "47", label: "Policy documents indexed", sub: "CCCCO, analysis, memos" }
@@ -722,8 +722,8 @@ function Espanol() {
             Soy Fundador y Dueño de EmpathySystem.ai, una empresa de inteligencia 
             artificial para los sectores de salud y organizaciones sin fines de lucro. Usé ese conocimiento 
             técnico para construir MyLocalBoard — un sistema de preguntas y respuestas que indexa 
-            349 reuniones del Consejo de Administración del colegio desde 1998, rastreando 2,656 votos, 
-            9,819 decisiones, 72 informes presupuestarios, 47 documentos de política estatal, y 46,518 proyectos de ley de California indexados. 
+            448 reuniones del Consejo de Administración del colegio desde 1998, rastreando 5,430 votos, 
+            20,019 decisiones, 72 informes presupuestarios, 47 documentos de política estatal, y 46,518 proyectos de ley de California indexados. 
             Cada respuesta está basada en documentos reales del Consejo con 
             citas específicas. Ningún candidato ha hecho esto antes. ¡Esto es transparencia!
           </p>
