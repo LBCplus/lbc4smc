@@ -141,7 +141,7 @@ export default async function handler(req, res) {
       context += "\n=== MEETING TRANSCRIPTS ===\n";
       for (var i = 0; i < Math.min(transcripts.length, 5); i++) {
         var t = transcripts[i];
-        var snippet = (t.raw_minutes_text || "").substring(0, 2000);
+        var snippet = (t.raw_minutes_text || "").substring(0, 800);
         context += "\n" + t.date + " (" + t.meeting_type + "):\n" + snippet + "\n";
       }
     }
