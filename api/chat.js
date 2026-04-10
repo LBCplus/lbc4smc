@@ -43,7 +43,7 @@ export default async function handler(req, res) {
     if (sq) budgetDocs = await safeFetch(base + "budget_documents?select=fiscal_year,title,doc_type,extracted_data,key_findings,total_revenue,total_expenditures,personnel_costs,personnel_cost_percentage,fund_balance,enrollment_ftes&fts=fts." + encodeURIComponent(sq) + "&order=fiscal_year.desc&limit=10");
     var recentBudget = await safeFetch(base + "budget_documents?select=fiscal_year,title,doc_type,total_revenue,total_expenditures,personnel_costs,personnel_cost_percentage,fund_balance,enrollment_ftes,key_findings&order=fiscal_year.desc&limit=5");
     var policyDocs = [];
-    if (sq) policyDocs = await safeFetch(base + "policy_documents?select=title,source,summary,impact,related_legislation,allocation_data&fts=fts." + encodeURIComponent(sq) + "&limit=10");
+    if (sq) policyDocs = await safeFetch(base + "policy_documents?select=title,source,summary,impact_on_smc,source_url&fts=fts." + encodeURIComponent(sq) + "&limit=10");
 
     // === LEVEL 2 DATA SOURCES ===
     var legislation = [];
