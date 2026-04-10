@@ -63,6 +63,13 @@ export default async function handler(req, res) {
     var ccLegislation = await safeFetch(base + "legislation?select=bill_number,session,title,status,signed_date,impact_assessment&is_cc_relevant=eq.true&status=eq.signed&impact_assessment=not.is.null&order=signed_date.desc.nullslast&limit=10");
     var enrollmentData = await safeFetch(base + "enrollment_data?select=academic_year,metric,value,unit,source&college=eq.Santa Monica College&order=academic_year.desc&limit=50");
 
+    // === TRANSCRIPT SEARCH ===
+    var transcripts = [];
+    if (sq) {
+      var transcriptWords = words.slice(0, 3).join("%");
+      transcripts = await safeFetch(base + "meetings?select=date,meeting_type,raw_minutes_text&raw_minutes_text=ilike.*" + encodeURIComponent(transcriptWords) + "*&order=date.desc&limit=10");
+    }
+
     // === MERGE AND DEDUPLICATE ===
     var seenDates = {};
     var allMeetings = [];
@@ -128,6 +135,16 @@ export default async function handler(req, res) {
         var pts = byMetric[metric].sort(function(a,b) { return a.academic_year.localeCompare(b.academic_year); });
         var ptStrs = [];
         for (var i = 0; i < pts.length; i++) { var p = pts[i]; var val = p.unit === "dollars" ? "$" + Number(p.value).toLocaleString() : (p.unit === "percentage" ? p.value + "%" : Number(p.value).toLocaleString()); ptStrs.push(p.academic_year + "=" + val); }
+
+    // Transcript snippets
+    if (transcripts.length > 0) {
+      context += "\n=== MEETING TRANSCRIPTS ===\n";
+      for (var i = 0; i < Math.min(transcripts.length, 5); i++) {
+        var t = transcripts[i];
+        var snippet = (t.raw_minutes_text || "").substring(0, 2000);
+        context += "\n" + t.date + " (" + t.meeting_type + "):\n" + snippet + "\n";
+      }
+    }
         context += ptStrs.join(", ") + " (Source: " + (byMetric[metric][0].source || "CCCCO") + ")\n";
       }
     }
