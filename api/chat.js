@@ -60,7 +60,7 @@ export default async function handler(req, res) {
       }
     }
 
-    var ccLegislation = await safeFetch(base + "legislation?select=bill_number,session,title,status,signed_date,impact_assessment&is_cc_relevant=eq.true&status=eq.signed&impact_assessment=not.is.null&order=signed_date.desc.nullslast&limit=25");
+    var ccLegislation = await safeFetch(base + "legislation?select=bill_number,session,title,status,signed_date,impact_assessment&is_cc_relevant=eq.true&status=eq.signed&impact_assessment=not.is.null&order=signed_date.desc.nullslast&limit=10");
     var enrollmentData = await safeFetch(base + "enrollment_data?select=academic_year,metric,value,unit,source&college=eq.Santa Monica College&order=academic_year.desc&limit=50");
 
     // === MERGE AND DEDUPLICATE ===
@@ -98,7 +98,7 @@ export default async function handler(req, res) {
     if (votes.length > 0) { context += "\n=== MATCHING VOTES ===\n"; for (var i = 0; i < Math.min(votes.length, 15); i++) { var v = votes[i]; context += v.meeting_date + ": " + v.motion_text + " -> " + v.result; if (v.vote_yes && v.vote_yes.length) context += " | Yes: " + v.vote_yes.join(", "); if (v.vote_no && v.vote_no.length) context += " | No: " + v.vote_no.join(", "); context += "\n"; } }
     if (decisions.length > 0) { context += "\n=== MATCHING DECISIONS ===\n"; for (var i = 0; i < Math.min(decisions.length, 15); i++) { var d = decisions[i]; context += d.meeting_date + ": " + d.description; if (d.dollar_amount) context += " ($" + Number(d.dollar_amount).toLocaleString() + ")"; if (d.category) context += " [" + d.category + "]"; context += "\n"; } }
     if (allBudget.length > 0) { context += "\n=== BUDGET DOCUMENTS ===\n"; for (var i = 0; i < Math.min(allBudget.length, 10); i++) { var b = allBudget[i]; context += b.fiscal_year + ": " + b.title + "\n"; if (b.total_revenue) context += "  Revenue: $" + Number(b.total_revenue).toLocaleString() + "\n"; if (b.total_expenditures) context += "  Expenditures: $" + Number(b.total_expenditures).toLocaleString() + "\n"; if (b.personnel_costs) { context += "  Personnel Costs: $" + Number(b.personnel_costs).toLocaleString(); if (b.personnel_cost_percentage) context += " (" + b.personnel_cost_percentage + "%)"; context += "\n"; } if (b.fund_balance) context += "  Fund Balance: $" + Number(b.fund_balance).toLocaleString() + "\n"; if (b.enrollment_ftes) context += "  Enrollment FTES: " + Number(b.enrollment_ftes).toLocaleString() + "\n"; if (b.key_findings && b.key_findings.length) context += "  Key Findings: " + b.key_findings.join("; ") + "\n"; } }
-    if (policyDocs.length > 0) { context += "\n=== POLICY DOCUMENTS ===\n"; for (var i = 0; i < Math.min(policyDocs.length, 8); i++) { var p = policyDocs[i]; context += p.title + " (Source: " + (p.source || "unknown") + ")\n"; if (p.summary) context += "  Summary: " + p.summary + "\n"; if (p.impact) context += "  Impact: " + p.impact + "\n"; if (p.related_legislation && p.related_legislation.length) context += "  Related legislation: " + p.related_legislation.join(", ") + "\n"; } }
+    if (policyDocs.length > 0) { context += "\n=== POLICY DOCUMENTS ===\n"; for (var i = 0; i < Math.min(policyDocs.length, 8); i++) { var p = policyDocs[i]; context += p.title + " (Source: " + (p.source || "unknown") + ")\n"; if (p.summary) context += "  Summary: " + p.summary + "\n"; if (p.impact_on_smc) context += "  Impact: " + p.impact_on_smc.substring(0, 500) + "\n"; } }
 
     // === LEVEL 2 CONTEXT ===
     if (allLegislation.length > 0) {
