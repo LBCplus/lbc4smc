@@ -67,7 +67,7 @@ export default async function handler(req, res) {
     var transcripts = [];
     if (sq) {
       var transcriptWords = words[0] || "";
-      transcripts = await safeFetch(base + "meetings?select=date,meeting_type,raw_minutes_text&raw_minutes_text=ilike.*" + encodeURIComponent(transcriptWords) + "*&order=date.desc&limit=10");
+      transcripts = await safeFetch(base + "meetings?select=date,meeting_type,raw_minutes_text&raw_minutes_text=ilike.*" + encodeURIComponent(transcriptWords) + "*&date=gte.2021-01-01&order=date.desc&limit=10");
     }
 
     // === MERGE AND DEDUPLICATE ===
