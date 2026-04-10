@@ -67,7 +67,7 @@ export default async function handler(req, res) {
     var transcripts = [];
     if (sq) {
       var transcriptWords = words[0] || "";
-      transcripts = await safeFetch(base + "meetings?select=date,meeting_type,raw_minutes_text&raw_minutes_text=ilike.*" + encodeURIComponent(transcriptWords) + "*&date=gte.2021-01-01&order=date.desc&limit=10");
+      transcripts = await safeFetch(base + "meetings?select=date,meeting_type,raw_minutes_text&raw_minutes_text=ilike.*" + encodeURIComponent(transcriptWords) + "*&date=gte.2021-01-01&order=date.desc&limit=5");
     }
 
     // === MERGE AND DEDUPLICATE ===
@@ -110,18 +110,18 @@ export default async function handler(req, res) {
     // === LEVEL 2 CONTEXT ===
     if (allLegislation.length > 0) {
       context += "\n=== CALIFORNIA LEGISLATION ===\n";
-      for (var i = 0; i < Math.min(allLegislation.length, 12); i++) {
+      for (var i = 0; i < Math.min(allLegislation.length, 6); i++) {
         var l = allLegislation[i];
         context += l.bill_number + " (" + l.session + "): " + (l.title || l.description || "") + "\n";
         context += "  Author: " + (l.author || "unknown") + " | Status: " + (l.status || "unknown");
         if (l.signed_date) context += " | Signed: " + l.signed_date;
         context += "\n";
         if (l.impact_assessment) { var ia = l.impact_assessment;
-          if (ia.impact_on_community_colleges) context += "  Impact on CCs: " + ia.impact_on_community_colleges + "\n";
-          if (ia.impact_on_smc) context += "  Impact on SMC: " + ia.impact_on_smc + "\n";
+          if (ia.impact_on_community_colleges) context += "  Impact on CCs: " + ia.impact_on_community_colleges.substring(0, 200) + "\n";
+          if (ia.impact_on_smc) context += "  Impact on SMC: " + ia.impact_on_smc.substring(0, 200) + "\n";
           if (ia.funding_implications) context += "  Funding: " + ia.funding_implications + "\n";
           if (ia.scff_relevance && ia.scff_relevance !== "Not directly related to SCFF.") context += "  SCFF relevance: " + ia.scff_relevance + "\n";
-          if (ia.causal_connections) context += "  Causal connections: " + ia.causal_connections + "\n";
+          if (ia.causal_connections) context += "  Causal connections: " + ia.causal_connections.substring(0, 200) + "\n";
         }
         if (l.related_bills && l.related_bills.length) context += "  Related bills: " + l.related_bills.join(", ") + "\n";
       }
@@ -141,7 +141,7 @@ export default async function handler(req, res) {
       context += "\n=== MEETING TRANSCRIPTS ===\n";
       for (var i = 0; i < Math.min(transcripts.length, 5); i++) {
         var t = transcripts[i];
-        var snippet = (t.raw_minutes_text || "").substring(0, 800);
+        var snippet = (t.raw_minutes_text || "").substring(0, 500);
         context += "\n" + t.date + " (" + t.meeting_type + "):\n" + snippet + "\n";
       }
     }
