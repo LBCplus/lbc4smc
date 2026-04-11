@@ -344,7 +344,7 @@ export default async function handler(req, res) {
         policy_docs_found: policyDocs.length,
         semantic_meetings: semanticMeetings.length,
         semantic_decisions: semanticDecisions.length,
-        semantic_legislation: semanticLegislation.length
+        semantic_legislation: semanticLegislation.length, transcripts_found: transcripts.length
       }
     });
   } catch (err) {
