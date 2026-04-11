@@ -11,6 +11,7 @@ export default async function handler(req, res) {
   const SUPABASE_URL = process.env.SUPABASE_URL;
   const SUPABASE_KEY = process.env.SUPABASE_KEY;
   const GEMINI_KEY = process.env.GEMINI_API_KEY;
+  const OPENAI_KEY = process.env.OPENAI_API_KEY;
   if (!SUPABASE_URL || !SUPABASE_KEY || !GEMINI_KEY) {
     return res.status(500).json({ error: "Server config incomplete" });
   }
@@ -24,6 +25,20 @@ export default async function handler(req, res) {
       var d = await r.json();
       return Array.isArray(d) ? d : [];
     } catch(e) { return []; }
+  }
+
+  // Layer 3: Embedding function for semantic search
+  async function getEmbedding(text) {
+    if (!OPENAI_KEY) return null;
+    try {
+      var r = await fetch("https://api.openai.com/v1/embeddings", {
+        method: "POST",
+        headers: { "Authorization": "Bearer " + OPENAI_KEY, "Content-Type": "application/json" },
+        body: JSON.stringify({ model: "text-embedding-3-small", input: text.substring(0, 8000) })
+      });
+      var d = await r.json();
+      return d.data && d.data[0] ? d.data[0].embedding : null;
+    } catch(e) { return null; }
   }
 
   try {
@@ -67,7 +82,52 @@ export default async function handler(req, res) {
     var transcripts = [];
     if (sq) {
       var transcriptWords = words[0] || "";
-      transcripts = await safeFetch(base + "meetings?select=date,meeting_type,raw_minutes_text&raw_minutes_text=ilike.*" + encodeURIComponent(transcriptWords) + "*&date=gte.2021-01-01&order=date.desc&limit=5");
+      transcripts = await safeFetch(base + "meetings?select=date,meeting_type,raw_minutes_text&raw_minutes_text=ilike.*" + encodeURIComponent(transcriptWords) + "*&date=gte.2018-01-01&order=date.desc&limit=5");
+    }
+
+    // === LAYER 3: SEMANTIC SEARCH ===
+    var semanticMeetings = [];
+    var semanticDecisions = [];
+    var semanticLegislation = [];
+    var semanticPolicyDocs = [];
+
+    var questionEmbedding = await getEmbedding(question);
+    if (questionEmbedding) {
+      try {
+        var sr1 = await fetch(base + "rpc/match_meetings", {
+          method: "POST", headers: { ...h, "Content-Type": "application/json" },
+          body: JSON.stringify({ query_embedding: questionEmbedding, match_threshold: 0.65, match_count: 5 })
+        });
+        var sd1 = await sr1.json();
+        if (Array.isArray(sd1)) semanticMeetings = sd1;
+      } catch(e) {}
+
+      try {
+        var sr2 = await fetch(base + "rpc/match_decisions", {
+          method: "POST", headers: { ...h, "Content-Type": "application/json" },
+          body: JSON.stringify({ query_embedding: questionEmbedding, match_threshold: 0.65, match_count: 10 })
+        });
+        var sd2 = await sr2.json();
+        if (Array.isArray(sd2)) semanticDecisions = sd2;
+      } catch(e) {}
+
+      try {
+        var sr3 = await fetch(base + "rpc/match_legislation", {
+          method: "POST", headers: { ...h, "Content-Type": "application/json" },
+          body: JSON.stringify({ query_embedding: questionEmbedding, match_threshold: 0.65, match_count: 5 })
+        });
+        var sd3 = await sr3.json();
+        if (Array.isArray(sd3)) semanticLegislation = sd3;
+      } catch(e) {}
+
+      try {
+        var sr4 = await fetch(base + "rpc/match_policy_docs", {
+          method: "POST", headers: { ...h, "Content-Type": "application/json" },
+          body: JSON.stringify({ query_embedding: questionEmbedding, match_threshold: 0.65, match_count: 5 })
+        });
+        var sd4 = await sr4.json();
+        if (Array.isArray(sd4)) semanticPolicyDocs = sd4;
+      } catch(e) {}
     }
 
     // === MERGE AND DEDUPLICATE ===
@@ -91,6 +151,7 @@ export default async function handler(req, res) {
     var context = "SANTA MONICA COLLEGE BOARD OF TRUSTEES — CIVIC TRANSPARENCY DATA\n";
     context += "Database: 448 meetings (1998-2026), 5,430 votes, 20,019 decisions, 72 budget documents, 46,518 CA bills indexed (5,338 education, 607 CC-relevant with impact assessments).\n\n";
 
+    // Meetings
     if (allMeetings.length > 0) {
       context += "=== MEETINGS ===\n";
       for (var i = 0; i < Math.min(allMeetings.length, 12); i++) {
@@ -102,12 +163,22 @@ export default async function handler(req, res) {
         }
       }
     }
+
+    // Votes
     if (votes.length > 0) { context += "\n=== MATCHING VOTES ===\n"; for (var i = 0; i < Math.min(votes.length, 15); i++) { var v = votes[i]; context += v.meeting_date + ": " + v.motion_text + " -> " + v.result; if (v.vote_yes && v.vote_yes.length) context += " | Yes: " + v.vote_yes.join(", "); if (v.vote_no && v.vote_no.length) context += " | No: " + v.vote_no.join(", "); context += "\n"; } }
+
+    // Decisions
     if (decisions.length > 0) { context += "\n=== MATCHING DECISIONS ===\n"; for (var i = 0; i < Math.min(decisions.length, 15); i++) { var d = decisions[i]; context += d.meeting_date + ": " + d.description; if (d.dollar_amount) context += " ($" + Number(d.dollar_amount).toLocaleString() + ")"; if (d.category) context += " [" + d.category + "]"; context += "\n"; } }
+
+    // Budget documents
     if (allBudget.length > 0) { context += "\n=== BUDGET DOCUMENTS ===\n"; for (var i = 0; i < Math.min(allBudget.length, 10); i++) { var b = allBudget[i]; context += b.fiscal_year + ": " + b.title + "\n"; if (b.total_revenue) context += "  Revenue: $" + Number(b.total_revenue).toLocaleString() + "\n"; if (b.total_expenditures) context += "  Expenditures: $" + Number(b.total_expenditures).toLocaleString() + "\n"; if (b.personnel_costs) { context += "  Personnel Costs: $" + Number(b.personnel_costs).toLocaleString(); if (b.personnel_cost_percentage) context += " (" + b.personnel_cost_percentage + "%)"; context += "\n"; } if (b.fund_balance) context += "  Fund Balance: $" + Number(b.fund_balance).toLocaleString() + "\n"; if (b.enrollment_ftes) context += "  Enrollment FTES: " + Number(b.enrollment_ftes).toLocaleString() + "\n"; if (b.key_findings && b.key_findings.length) context += "  Key Findings: " + b.key_findings.join("; ") + "\n"; } }
+
+    // Policy documents
     if (policyDocs.length > 0) { context += "\n=== POLICY DOCUMENTS ===\n"; for (var i = 0; i < Math.min(policyDocs.length, 8); i++) { var p = policyDocs[i]; context += p.title + " (Source: " + (p.source || "unknown") + ")\n"; if (p.summary) context += "  Summary: " + p.summary + "\n"; if (p.impact_on_smc) context += "  Impact: " + p.impact_on_smc.substring(0, 500) + "\n"; } }
 
     // === LEVEL 2 CONTEXT ===
+
+    // Legislation
     if (allLegislation.length > 0) {
       context += "\n=== CALIFORNIA LEGISLATION ===\n";
       for (var i = 0; i < Math.min(allLegislation.length, 6); i++) {
@@ -126,6 +197,8 @@ export default async function handler(req, res) {
         if (l.related_bills && l.related_bills.length) context += "  Related bills: " + l.related_bills.join(", ") + "\n";
       }
     }
+
+    // Enrollment data
     if (enrollmentData.length > 0) {
       context += "\n=== SMC ENROLLMENT & OUTCOME DATA ===\n";
       var byMetric = {};
@@ -135,6 +208,9 @@ export default async function handler(req, res) {
         var pts = byMetric[metric].sort(function(a,b) { return a.academic_year.localeCompare(b.academic_year); });
         var ptStrs = [];
         for (var i = 0; i < pts.length; i++) { var p = pts[i]; var val = p.unit === "dollars" ? "$" + Number(p.value).toLocaleString() : (p.unit === "percentage" ? p.value + "%" : Number(p.value).toLocaleString()); ptStrs.push(p.academic_year + "=" + val); }
+        context += ptStrs.join(", ") + " (Source: " + (byMetric[metric][0].source || "CCCCO") + ")\n";
+      }
+    }
 
     // Transcript snippets
     if (transcripts.length > 0) {
@@ -145,7 +221,46 @@ export default async function handler(req, res) {
         context += "\n" + t.date + " (" + t.meeting_type + "):\n" + snippet + "\n";
       }
     }
-        context += ptStrs.join(", ") + " (Source: " + (byMetric[metric][0].source || "CCCCO") + ")\n";
+
+    // === LAYER 3: SEMANTIC SEARCH RESULTS ===
+    if (semanticMeetings.length > 0 || semanticDecisions.length > 0 || semanticLegislation.length > 0 || semanticPolicyDocs.length > 0) {
+      context += "\n=== SEMANTIC SEARCH (meaning-based, may not share keywords) ===\n";
+
+      if (semanticMeetings.length > 0) {
+        context += "\nRelated meeting transcripts:\n";
+        for (var i = 0; i < semanticMeetings.length; i++) {
+          var sm = semanticMeetings[i];
+          context += sm.date + " (" + sm.meeting_type + ") [" + (sm.similarity * 100).toFixed(0) + "% relevant]: ";
+          context += (sm.raw_minutes_text || "").substring(0, 400) + "\n";
+        }
+      }
+
+      if (semanticDecisions.length > 0) {
+        context += "\nRelated decisions:\n";
+        for (var i = 0; i < Math.min(semanticDecisions.length, 8); i++) {
+          var sd = semanticDecisions[i];
+          context += sd.meeting_date + ": " + sd.description;
+          if (sd.dollar_amount) context += " ($" + Number(sd.dollar_amount).toLocaleString() + ")";
+          context += " [" + (sd.similarity * 100).toFixed(0) + "% relevant]\n";
+        }
+      }
+
+      if (semanticLegislation.length > 0) {
+        context += "\nRelated legislation:\n";
+        for (var i = 0; i < semanticLegislation.length; i++) {
+          var sl = semanticLegislation[i];
+          context += sl.bill_number + " (" + sl.session + "): " + (sl.title || sl.summary || "").substring(0, 200);
+          context += " [" + (sl.similarity * 100).toFixed(0) + "% relevant]\n";
+        }
+      }
+
+      if (semanticPolicyDocs.length > 0) {
+        context += "\nRelated policy documents:\n";
+        for (var i = 0; i < semanticPolicyDocs.length; i++) {
+          var sp = semanticPolicyDocs[i];
+          context += sp.title + ": " + (sp.summary || "").substring(0, 300);
+          context += " [" + (sp.similarity * 100).toFixed(0) + "% relevant]\n";
+        }
       }
     }
 
@@ -156,6 +271,7 @@ export default async function handler(req, res) {
     systemPrompt += "WHEN ANSWERING 'WHY' QUESTIONS, TRACE THE CAUSAL CHAIN:\n1. LEGISLATION: What state law created the policy framework? Cite bill number.\n2. IMPLEMENTATION: How did CCCCO translate this into requirements?\n3. INSTITUTIONAL RESPONSE: What did the board decide? Cite meeting date.\n4. BUDGET IMPACT: Where do the dollars show the result? Cite fiscal year and amount.\n5. OUTCOME: What happened to students, enrollment, or financial stability?\n\n";
     systemPrompt += "NEUTRALITY (CRITICAL):\n- Present DATA and CITATIONS, never opinions or characterizations\n- WRONG: 'The board failed to invest in workforce development'\n- RIGHT: 'The FY2023-24 Adopted Budget shows $0 in unrestricted general fund investment in workforce development or career technical education'\n- The reader draws their own conclusions. You provide the evidence.\n\n";
     systemPrompt += "PLAIN LANGUAGE:\n- Define every acronym on first use\n- Lead with impact, then explain mechanism\n- Use concrete numbers, not abstractions\n- Connect policy to daily life when possible\n\n";
+    systemPrompt += "LAYER 3 — SEMANTIC SEARCH:\nYou may receive results from semantic (meaning-based) search in addition to keyword search. These results are found by meaning similarity, not keyword match. Use them when they are relevant to the question, even if they don't share exact words with the query.\n\n";
     systemPrompt += "DISCLOSURE: End every answer that uses legislation or policy data with:\n'This analysis is generated by MyLocalBoard from public records and California state legislation. It reflects data, not editorial opinion.'\n\n";
     systemPrompt += context;
 
@@ -172,7 +288,19 @@ export default async function handler(req, res) {
 
     return res.status(200).json({
       answer: answer,
-      sources: { meetings_found: allMeetings.length, votes_found: votes.length, decisions_found: decisions.length, budget_docs_found: allBudget.length, legislation_found: allLegislation.length, enrollment_records: enrollmentData.length, policy_docs_found: policyDocs.length }
+      sources: {
+        meetings_found: allMeetings.length,
+        votes_found: votes.length,
+        decisions_found: decisions.length,
+        budget_docs_found: allBudget.length,
+        legislation_found: allLegislation.length,
+        enrollment_records: enrollmentData.length,
+        policy_docs_found: policyDocs.length,
+        semantic_meetings: semanticMeetings.length,
+        semantic_decisions: semanticDecisions.length,
+        semantic_legislation: semanticLegislation.length,
+        semantic_policy_docs: semanticPolicyDocs.length
+      }
     });
   } catch (err) {
     console.error("MyLocalBoard API error:", err);
