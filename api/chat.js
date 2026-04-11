@@ -5,8 +5,10 @@ export default async function handler(req, res) {
   if (req.method === "OPTIONS") return res.status(200).end();
   if (req.method !== "POST") return res.status(405).json({ error: "POST only" });
 
-  const { question } = req.body;
+  const { question, board } = req.body;
   if (!question) return res.status(400).json({ error: "Question required" });
+
+  const boardId = board || "smc";  // Default to SMC for backward compatibility
 
   const SUPABASE_URL = process.env.SUPABASE_URL;
   const SUPABASE_KEY = process.env.SUPABASE_KEY;
@@ -18,6 +20,7 @@ export default async function handler(req, res) {
 
   const h = { apikey: SUPABASE_KEY, Authorization: "Bearer " + SUPABASE_KEY };
   const base = SUPABASE_URL + "/rest/v1/";
+  const bf = "&board_id=eq." + encodeURIComponent(boardId);  // Board filter for all queries
 
   async function safeFetch(url) {
     try {
@@ -27,7 +30,6 @@ export default async function handler(req, res) {
     } catch(e) { return []; }
   }
 
-  // Layer 3: Embedding function for semantic search
   async function getEmbedding(text) {
     if (!OPENAI_KEY) return null;
     try {
@@ -42,25 +44,31 @@ export default async function handler(req, res) {
   }
 
   try {
+    // Load board config
+    var boardConfig = await safeFetch(base + "boards?id=eq." + encodeURIComponent(boardId) + "&limit=1");
+    var boardName = (boardConfig[0] && boardConfig[0].name) || "Local Board";
+    var boardCity = (boardConfig[0] && boardConfig[0].city) || "";
+    var boardShort = (boardConfig[0] && boardConfig[0].short_name) || boardId.toUpperCase();
+
     const stop = new Set(["the","a","an","and","or","but","in","on","at","to","for","of","with","by","from","is","was","are","were","been","has","have","had","do","does","did","will","would","could","should","may","might","can","how","what","when","where","who","which","that","this","these","those","about","most","recent","last","latest","first","all","any","each","every","many","much","some","more","other","into"]);
     const words = question.toLowerCase().split(/\s+/).filter(function(w) { return w.length > 2 && !stop.has(w); });
     const sq = words.join("+");
 
-    // === LEVEL 1 DATA SOURCES ===
-    var recentMeetings = await safeFetch(base + "meetings?select=id,date,meeting_type,title,topics,extracted_data&order=date.desc&limit=10");
+    // === LEVEL 1 DATA SOURCES (filtered by board) ===
+    var recentMeetings = await safeFetch(base + "meetings?select=id,date,meeting_type,title,topics,extracted_data&order=date.desc&limit=10" + bf);
     var searchMeetings = [];
-    if (sq) searchMeetings = await safeFetch(base + "meetings?select=id,date,meeting_type,title,topics,extracted_data&fts=fts." + encodeURIComponent(sq) + "&order=date.desc&limit=15");
+    if (sq) searchMeetings = await safeFetch(base + "meetings?select=id,date,meeting_type,title,topics,extracted_data&fts=fts." + encodeURIComponent(sq) + "&order=date.desc&limit=15" + bf);
     var votes = [];
-    if (sq) votes = await safeFetch(base + "votes?select=meeting_date,motion_text,result,vote_yes,vote_no,vote_abstain,vote_absent,topic_tags&fts=fts." + encodeURIComponent(sq) + "&order=meeting_date.desc&limit=20");
+    if (sq) votes = await safeFetch(base + "votes?select=meeting_date,motion_text,result,vote_yes,vote_no,vote_abstain,vote_absent,topic_tags&fts=fts." + encodeURIComponent(sq) + "&order=meeting_date.desc&limit=20" + bf);
     var decisions = [];
-    if (sq) decisions = await safeFetch(base + "decisions?select=meeting_date,description,category,dollar_amount,topic_tags&fts=fts." + encodeURIComponent(sq) + "&order=meeting_date.desc&limit=20");
+    if (sq) decisions = await safeFetch(base + "decisions?select=meeting_date,description,category,dollar_amount,topic_tags&fts=fts." + encodeURIComponent(sq) + "&order=meeting_date.desc&limit=20" + bf);
     var budgetDocs = [];
-    if (sq) budgetDocs = await safeFetch(base + "budget_documents?select=fiscal_year,title,doc_type,extracted_data,key_findings,total_revenue,total_expenditures,personnel_costs,personnel_cost_percentage,fund_balance,enrollment_ftes&fts=fts." + encodeURIComponent(sq) + "&order=fiscal_year.desc&limit=10");
-    var recentBudget = await safeFetch(base + "budget_documents?select=fiscal_year,title,doc_type,total_revenue,total_expenditures,personnel_costs,personnel_cost_percentage,fund_balance,enrollment_ftes,key_findings&order=fiscal_year.desc&limit=5");
+    if (sq) budgetDocs = await safeFetch(base + "budget_documents?select=fiscal_year,title,doc_type,extracted_data,key_findings,total_revenue,total_expenditures,personnel_costs,personnel_cost_percentage,fund_balance,enrollment_ftes&fts=fts." + encodeURIComponent(sq) + "&order=fiscal_year.desc&limit=10" + bf);
+    var recentBudget = await safeFetch(base + "budget_documents?select=fiscal_year,title,doc_type,total_revenue,total_expenditures,personnel_costs,personnel_cost_percentage,fund_balance,enrollment_ftes,key_findings&order=fiscal_year.desc&limit=5" + bf);
     var policyDocs = [];
-    if (sq) policyDocs = await safeFetch(base + "policy_documents?select=title,source,summary,impact_on_smc,source_url&fts=fts." + encodeURIComponent(sq) + "&limit=10");
+    if (sq) policyDocs = await safeFetch(base + "policy_documents?select=title,source,summary,impact_on_smc,source_url&fts=fts." + encodeURIComponent(sq) + "&limit=10" + bf);
 
-    // === LEVEL 2 DATA SOURCES ===
+    // === LEVEL 2 DATA SOURCES (legislation is statewide, no board filter) ===
     var legislation = [];
     if (sq) legislation = await safeFetch(base + "legislation?select=bill_number,session,title,description,author,status,signed_date,summary,subject_tags,impact_assessment,related_bills,code_sections&fts=fts." + encodeURIComponent(sq) + "&is_education=eq.true&order=signed_date.desc.nullslast&limit=15");
 
@@ -76,16 +84,16 @@ export default async function handler(req, res) {
     }
 
     var ccLegislation = await safeFetch(base + "legislation?select=bill_number,session,title,status,signed_date,impact_assessment&is_cc_relevant=eq.true&status=eq.signed&impact_assessment=not.is.null&order=signed_date.desc.nullslast&limit=10");
-    var enrollmentData = await safeFetch(base + "enrollment_data?select=academic_year,metric,value,unit,source&college=eq.Santa Monica College&order=academic_year.desc&limit=50");
+    var enrollmentData = await safeFetch(base + "enrollment_data?select=academic_year,metric,value,unit,source&order=academic_year.desc&limit=50" + bf);
 
-    // === TRANSCRIPT SEARCH ===
+    // === TRANSCRIPT SEARCH (filtered by board) ===
     var transcripts = [];
     if (sq) {
       var transcriptWords = words[0] || "";
-      transcripts = await safeFetch(base + "meetings?select=date,meeting_type,raw_minutes_text&raw_minutes_text=ilike.*" + encodeURIComponent(transcriptWords) + "*&date=gte.2018-01-01&order=date.desc&limit=5");
+      transcripts = await safeFetch(base + "meetings?select=date,meeting_type,raw_minutes_text&raw_minutes_text=ilike.*" + encodeURIComponent(transcriptWords) + "*&date=gte.2018-01-01&order=date.desc&limit=5" + bf);
     }
 
-    // === LAYER 3: SEMANTIC SEARCH ===
+    // === LAYER 3: SEMANTIC SEARCH (filtered by board) ===
     var semanticMeetings = [];
     var semanticDecisions = [];
     var semanticLegislation = [];
@@ -96,7 +104,7 @@ export default async function handler(req, res) {
       try {
         var sr1 = await fetch(base + "rpc/match_meetings", {
           method: "POST", headers: { ...h, "Content-Type": "application/json" },
-          body: JSON.stringify({ query_embedding: questionEmbedding, match_threshold: 0.65, match_count: 5 })
+          body: JSON.stringify({ query_embedding: questionEmbedding, match_threshold: 0.65, match_count: 5, filter_board: boardId })
         });
         var sd1 = await sr1.json();
         if (Array.isArray(sd1)) semanticMeetings = sd1;
@@ -105,7 +113,7 @@ export default async function handler(req, res) {
       try {
         var sr2 = await fetch(base + "rpc/match_decisions", {
           method: "POST", headers: { ...h, "Content-Type": "application/json" },
-          body: JSON.stringify({ query_embedding: questionEmbedding, match_threshold: 0.65, match_count: 10 })
+          body: JSON.stringify({ query_embedding: questionEmbedding, match_threshold: 0.65, match_count: 10, filter_board: boardId })
         });
         var sd2 = await sr2.json();
         if (Array.isArray(sd2)) semanticDecisions = sd2;
@@ -123,7 +131,7 @@ export default async function handler(req, res) {
       try {
         var sr4 = await fetch(base + "rpc/match_policy_docs", {
           method: "POST", headers: { ...h, "Content-Type": "application/json" },
-          body: JSON.stringify({ query_embedding: questionEmbedding, match_threshold: 0.65, match_count: 5 })
+          body: JSON.stringify({ query_embedding: questionEmbedding, match_threshold: 0.65, match_count: 5, filter_board: boardId })
         });
         var sd4 = await sr4.json();
         if (Array.isArray(sd4)) semanticPolicyDocs = sd4;
@@ -148,8 +156,8 @@ export default async function handler(req, res) {
     for (var i = 0; i < combinedLeg.length; i++) { var l = combinedLeg[i]; var lkey = l.bill_number + "_" + l.session; if (!seenBills[lkey]) { seenBills[lkey] = true; allLegislation.push(l); } }
 
     // === BUILD CONTEXT ===
-    var context = "SANTA MONICA COLLEGE BOARD OF TRUSTEES — CIVIC TRANSPARENCY DATA\n";
-    context += "Database: 448 meetings (1998-2026), 5,430 votes, 20,019 decisions, 72 budget documents, 46,518 CA bills indexed (5,338 education, 607 CC-relevant with impact assessments).\n\n";
+    var context = boardName.toUpperCase() + " — CIVIC TRANSPARENCY DATA\n";
+    context += "Board: " + boardName + " (" + boardCity + ")\n\n";
 
     // Meetings
     if (allMeetings.length > 0) {
@@ -177,8 +185,6 @@ export default async function handler(req, res) {
     if (policyDocs.length > 0) { context += "\n=== POLICY DOCUMENTS ===\n"; for (var i = 0; i < Math.min(policyDocs.length, 8); i++) { var p = policyDocs[i]; context += p.title + " (Source: " + (p.source || "unknown") + ")\n"; if (p.summary) context += "  Summary: " + p.summary + "\n"; if (p.impact_on_smc) context += "  Impact: " + p.impact_on_smc.substring(0, 500) + "\n"; } }
 
     // === LEVEL 2 CONTEXT ===
-
-    // Legislation
     if (allLegislation.length > 0) {
       context += "\n=== CALIFORNIA LEGISLATION ===\n";
       for (var i = 0; i < Math.min(allLegislation.length, 6); i++) {
@@ -200,7 +206,7 @@ export default async function handler(req, res) {
 
     // Enrollment data
     if (enrollmentData.length > 0) {
-      context += "\n=== SMC ENROLLMENT & OUTCOME DATA ===\n";
+      context += "\n=== ENROLLMENT & OUTCOME DATA ===\n";
       var byMetric = {};
       for (var i = 0; i < enrollmentData.length; i++) { var e = enrollmentData[i]; if (!byMetric[e.metric]) byMetric[e.metric] = []; byMetric[e.metric].push(e); }
       for (var metric in byMetric) {
@@ -212,7 +218,7 @@ export default async function handler(req, res) {
       }
     }
 
-    // Transcript snippets
+    // Transcripts
     if (transcripts.length > 0) {
       context += "\n=== MEETING TRANSCRIPTS ===\n";
       for (var i = 0; i < Math.min(transcripts.length, 5); i++) {
@@ -222,56 +228,35 @@ export default async function handler(req, res) {
       }
     }
 
-    // === LAYER 3: SEMANTIC SEARCH RESULTS ===
+    // === LAYER 3: SEMANTIC RESULTS ===
     if (semanticMeetings.length > 0 || semanticDecisions.length > 0 || semanticLegislation.length > 0 || semanticPolicyDocs.length > 0) {
-      context += "\n=== SEMANTIC SEARCH (meaning-based, may not share keywords) ===\n";
-
+      context += "\n=== SEMANTIC SEARCH (meaning-based) ===\n";
       if (semanticMeetings.length > 0) {
         context += "\nRelated meeting transcripts:\n";
-        for (var i = 0; i < semanticMeetings.length; i++) {
-          var sm = semanticMeetings[i];
-          context += sm.date + " (" + sm.meeting_type + ") [" + (sm.similarity * 100).toFixed(0) + "% relevant]: ";
-          context += (sm.raw_minutes_text || "").substring(0, 400) + "\n";
-        }
+        for (var i = 0; i < semanticMeetings.length; i++) { var sm = semanticMeetings[i]; context += sm.date + " (" + sm.meeting_type + ") [" + (sm.similarity * 100).toFixed(0) + "%]: " + (sm.raw_minutes_text || "").substring(0, 400) + "\n"; }
       }
-
       if (semanticDecisions.length > 0) {
         context += "\nRelated decisions:\n";
-        for (var i = 0; i < Math.min(semanticDecisions.length, 8); i++) {
-          var sd = semanticDecisions[i];
-          context += sd.meeting_date + ": " + sd.description;
-          if (sd.dollar_amount) context += " ($" + Number(sd.dollar_amount).toLocaleString() + ")";
-          context += " [" + (sd.similarity * 100).toFixed(0) + "% relevant]\n";
-        }
+        for (var i = 0; i < Math.min(semanticDecisions.length, 8); i++) { var sd = semanticDecisions[i]; context += sd.meeting_date + ": " + sd.description; if (sd.dollar_amount) context += " ($" + Number(sd.dollar_amount).toLocaleString() + ")"; context += " [" + (sd.similarity * 100).toFixed(0) + "%]\n"; }
       }
-
       if (semanticLegislation.length > 0) {
         context += "\nRelated legislation:\n";
-        for (var i = 0; i < semanticLegislation.length; i++) {
-          var sl = semanticLegislation[i];
-          context += sl.bill_number + " (" + sl.session + "): " + (sl.title || sl.summary || "").substring(0, 200);
-          context += " [" + (sl.similarity * 100).toFixed(0) + "% relevant]\n";
-        }
+        for (var i = 0; i < semanticLegislation.length; i++) { var sl = semanticLegislation[i]; context += sl.bill_number + " (" + sl.session + "): " + (sl.title || sl.summary || "").substring(0, 200) + " [" + (sl.similarity * 100).toFixed(0) + "%]\n"; }
       }
-
       if (semanticPolicyDocs.length > 0) {
         context += "\nRelated policy documents:\n";
-        for (var i = 0; i < semanticPolicyDocs.length; i++) {
-          var sp = semanticPolicyDocs[i];
-          context += sp.title + ": " + (sp.summary || "").substring(0, 300);
-          context += " [" + (sp.similarity * 100).toFixed(0) + "% relevant]\n";
-        }
+        for (var i = 0; i < semanticPolicyDocs.length; i++) { var sp = semanticPolicyDocs[i]; context += sp.title + ": " + (sp.summary || "").substring(0, 300) + " [" + (sp.similarity * 100).toFixed(0) + "%]\n"; }
       }
     }
 
     // === SYSTEM PROMPT ===
-    var systemPrompt = "You are MyLocalBoard, a civic transparency AI for Santa Monica College Board of Trustees public records. Answer using ONLY the data below.\n\n";
-    systemPrompt += "RULES:\n- Cite specific meeting dates, budget document fiscal years, or bill numbers for every claim\n- Include trustee vote breakdowns when available\n- If data is insufficient, say so honestly\n- Include dollar amounts when discussing budget items\n- Current trustees (Dec 2025-Dec 2026): Chair Dr. Sion Roy, Vice Chair Dr. Tom Peters, Dr. Nancy Greenstein, Dr. Margaret Quinones-Perez, Dr. Luis Barrera Castanon (appointed Feb 2025), Rob Rader, Anastasia Foster (elected Nov 2024)\n- Write in plain text paragraphs. Do NOT use markdown like ** or ## or bullet points.\n- End with a line listing the meeting dates, budget documents, or legislation referenced.\n\n";
-    systemPrompt += "LEVEL 2 — POLICY INTELLIGENCE:\nYou have access to 46,518 California bills (2009-2026), 5,338 education-tagged, 607 CC-relevant with impact assessments, SMC enrollment trends, and CCCCO policy documents.\n\n";
-    systemPrompt += "WHEN ANSWERING 'WHY' QUESTIONS, TRACE THE CAUSAL CHAIN:\n1. LEGISLATION: What state law created the policy framework? Cite bill number.\n2. IMPLEMENTATION: How did CCCCO translate this into requirements?\n3. INSTITUTIONAL RESPONSE: What did the board decide? Cite meeting date.\n4. BUDGET IMPACT: Where do the dollars show the result? Cite fiscal year and amount.\n5. OUTCOME: What happened to students, enrollment, or financial stability?\n\n";
-    systemPrompt += "NEUTRALITY (CRITICAL):\n- Present DATA and CITATIONS, never opinions or characterizations\n- WRONG: 'The board failed to invest in workforce development'\n- RIGHT: 'The FY2023-24 Adopted Budget shows $0 in unrestricted general fund investment in workforce development or career technical education'\n- The reader draws their own conclusions. You provide the evidence.\n\n";
-    systemPrompt += "PLAIN LANGUAGE:\n- Define every acronym on first use\n- Lead with impact, then explain mechanism\n- Use concrete numbers, not abstractions\n- Connect policy to daily life when possible\n\n";
-    systemPrompt += "LAYER 3 — SEMANTIC SEARCH:\nYou may receive results from semantic (meaning-based) search in addition to keyword search. These results are found by meaning similarity, not keyword match. Use them when they are relevant to the question, even if they don't share exact words with the query.\n\n";
+    var systemPrompt = "You are MyLocalBoard, a civic transparency AI for " + boardName + " public records. Answer using ONLY the data below.\n\n";
+    systemPrompt += "RULES:\n- Cite specific meeting dates, budget document fiscal years, or bill numbers for every claim\n- Include vote breakdowns when available\n- If data is insufficient, say so honestly\n- Include dollar amounts when discussing budget items\n- Write in plain text paragraphs. Do NOT use markdown like ** or ## or bullet points.\n- End with a line listing the meeting dates, budget documents, or legislation referenced.\n\n";
+    systemPrompt += "LEVEL 2 — POLICY INTELLIGENCE:\nYou have access to California state legislation, enrollment trends, and policy documents.\n\n";
+    systemPrompt += "WHEN ANSWERING 'WHY' QUESTIONS, TRACE THE CAUSAL CHAIN:\n1. LEGISLATION: What state law created the policy framework? Cite bill number.\n2. IMPLEMENTATION: How was this translated into requirements?\n3. INSTITUTIONAL RESPONSE: What did the board decide? Cite meeting date.\n4. BUDGET IMPACT: Where do the dollars show the result? Cite fiscal year and amount.\n5. OUTCOME: What happened to students, enrollment, or financial stability?\n\n";
+    systemPrompt += "NEUTRALITY (CRITICAL):\n- Present DATA and CITATIONS, never opinions or characterizations\n- The reader draws their own conclusions. You provide the evidence.\n\n";
+    systemPrompt += "PLAIN LANGUAGE:\n- Define every acronym on first use\n- Lead with impact, then explain mechanism\n- Use concrete numbers, not abstractions\n\n";
+    systemPrompt += "LAYER 3 — SEMANTIC SEARCH:\nYou may receive results from semantic (meaning-based) search. Use them when relevant, even if they don't share exact words with the query.\n\n";
     systemPrompt += "DISCLOSURE: End every answer that uses legislation or policy data with:\n'This analysis is generated by MyLocalBoard from public records and California state legislation. It reflects data, not editorial opinion.'\n\n";
     systemPrompt += context;
 
@@ -288,6 +273,7 @@ export default async function handler(req, res) {
 
     return res.status(200).json({
       answer: answer,
+      board: boardId,
       sources: {
         meetings_found: allMeetings.length,
         votes_found: votes.length,
@@ -298,8 +284,7 @@ export default async function handler(req, res) {
         policy_docs_found: policyDocs.length,
         semantic_meetings: semanticMeetings.length,
         semantic_decisions: semanticDecisions.length,
-        semantic_legislation: semanticLegislation.length,
-        semantic_policy_docs: semanticPolicyDocs.length
+        semantic_legislation: semanticLegislation.length
       }
     });
   } catch (err) {
