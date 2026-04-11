@@ -90,9 +90,19 @@ export default async function handler(req, res) {
 
     // === TRANSCRIPT SEARCH (filtered by board) ===
     var transcripts = [];
-    if (sq) {
-      var transcriptWords = words[0] || "";
-      transcripts = await safeFetch(base + "meetings?select=date,meeting_type,raw_minutes_text&raw_minutes_text=ilike.*" + encodeURIComponent(transcriptWords) + "*&date=gte.2018-01-01&order=date.desc&limit=5" + bf);
+    if (words.length > 0) {
+      var searchResults = [];
+      for (var wi = 0; wi < Math.min(words.length, 4); wi++) {
+        var tw = words[wi].substring(0, 6);
+        if (tw.length < 3) continue;
+        var tr = await safeFetch(base + "meetings?select=date,meeting_type,raw_minutes_text&raw_minutes_text=ilike.*" + encodeURIComponent(tw) + "*&date=gte.2018-01-01&order=date.desc&limit=10" + bf);
+        for (var ti = 0; ti < tr.length; ti++) {
+          var exists = false;
+          for (var si = 0; si < searchResults.length; si++) { if (searchResults[si].date === tr[ti].date) { exists = true; break; } }
+          if (!exists) searchResults.push(tr[ti]);
+        }
+      }
+      transcripts = searchResults.slice(0, 10);
     }
 
     // === LAYER 3: SEMANTIC SEARCH (filtered by board) ===
@@ -225,7 +235,7 @@ export default async function handler(req, res) {
       context += "\n=== MEETING TRANSCRIPTS ===\n";
       for (var i = 0; i < Math.min(transcripts.length, 5); i++) {
         var t = transcripts[i];
-        var fullText = (t.raw_minutes_text || ""); var snippet = ""; var tw = words[0] || ""; var sIdx = fullText.toLowerCase().indexOf(tw.toLowerCase()); if (sIdx > 0) { snippet = fullText.substring(Math.max(0, sIdx - 100), sIdx + 400); } else { snippet = fullText.substring(0, 500); }
+        var fullText = (t.raw_minutes_text || ""); var snippet = ""; var ftl = fullText.toLowerCase(); for (var wi = 0; wi < words.length; wi++) { var stem = words[wi].substring(0, 6).toLowerCase(); var sIdx = ftl.indexOf(stem); if (sIdx > 0) { snippet = fullText.substring(Math.max(0, sIdx - 150), sIdx + 400); break; } } if (!snippet) snippet = fullText.substring(0, 500);
         context += "\n" + t.date + " (" + t.meeting_type + "):\n" + snippet + "\n";
       }
     }
