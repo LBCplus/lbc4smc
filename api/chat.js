@@ -92,7 +92,7 @@ export default async function handler(req, res) {
     var transcripts = [];
     if (words.length > 0) {
       var searchResults = [];
-      for (var wi = 0; wi < Math.min(words.length, 4); wi++) {
+      var commonWords = new Set(["board","meeting","meetings","college","santa","monica","trustee","trustees","school","year","years","last","time"]); for (var wi = 0; wi < Math.min(words.length, 4); wi++) { if (commonWords.has(words[wi])) continue;
         var tw = words[wi].substring(0, 6);
         if (tw.length < 3) continue;
         var tr = await safeFetch(base + "meetings?select=date,meeting_type,raw_minutes_text&raw_minutes_text=ilike.*" + encodeURIComponent(tw) + "*&date=gte.2018-01-01&order=date.desc&limit=10" + bf);
