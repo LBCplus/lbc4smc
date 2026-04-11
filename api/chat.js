@@ -104,7 +104,7 @@ export default async function handler(req, res) {
       try {
         var sr1 = await fetch(base + "rpc/match_meetings", {
           method: "POST", headers: { ...h, "Content-Type": "application/json" },
-          body: JSON.stringify({ query_embedding: questionEmbedding, match_threshold: 0.65, match_count: 5, filter_board: boardId })
+          body: JSON.stringify({ query_embedding: questionEmbedding, match_threshold: 0.25, match_count: 5, filter_board: boardId })
         });
         var sd1 = await sr1.json();
         if (Array.isArray(sd1)) semanticMeetings = sd1;
@@ -113,7 +113,7 @@ export default async function handler(req, res) {
       try {
         var sr2 = await fetch(base + "rpc/match_decisions", {
           method: "POST", headers: { ...h, "Content-Type": "application/json" },
-          body: JSON.stringify({ query_embedding: questionEmbedding, match_threshold: 0.65, match_count: 10, filter_board: boardId })
+          body: JSON.stringify({ query_embedding: questionEmbedding, match_threshold: 0.25, match_count: 10, filter_board: boardId })
         });
         var sd2 = await sr2.json();
         if (Array.isArray(sd2)) semanticDecisions = sd2;
@@ -122,7 +122,7 @@ export default async function handler(req, res) {
       try {
         var sr3 = await fetch(base + "rpc/match_legislation", {
           method: "POST", headers: { ...h, "Content-Type": "application/json" },
-          body: JSON.stringify({ query_embedding: questionEmbedding, match_threshold: 0.65, match_count: 5 })
+          body: JSON.stringify({ query_embedding: questionEmbedding, match_threshold: 0.25, match_count: 5 })
         });
         var sd3 = await sr3.json();
         if (Array.isArray(sd3)) semanticLegislation = sd3;
@@ -131,7 +131,7 @@ export default async function handler(req, res) {
       try {
         var sr4 = await fetch(base + "rpc/match_policy_docs", {
           method: "POST", headers: { ...h, "Content-Type": "application/json" },
-          body: JSON.stringify({ query_embedding: questionEmbedding, match_threshold: 0.65, match_count: 5, filter_board: boardId })
+          body: JSON.stringify({ query_embedding: questionEmbedding, match_threshold: 0.25, match_count: 5, filter_board: boardId })
         });
         var sd4 = await sr4.json();
         if (Array.isArray(sd4)) semanticPolicyDocs = sd4;
