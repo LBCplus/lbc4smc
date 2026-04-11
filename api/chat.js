@@ -44,6 +44,8 @@ export default async function handler(req, res) {
   }
 
   try {
+    var startTime = Date.now();
+
     // Load board config
     var boardConfig = await safeFetch(base + "boards?id=eq." + encodeURIComponent(boardId) + "&limit=1");
     var boardName = (boardConfig[0] && boardConfig[0].name) || "Local Board";
@@ -104,7 +106,7 @@ export default async function handler(req, res) {
       try {
         var sr1 = await fetch(base + "rpc/match_meetings", {
           method: "POST", headers: { ...h, "Content-Type": "application/json" },
-          body: JSON.stringify({ query_embedding: questionEmbedding, match_threshold: 0.25, match_count: 5, filter_board: boardId })
+          body: JSON.stringify({ query_embedding: questionEmbedding, match_threshold: 0.65, match_count: 5, filter_board: boardId })
         });
         var sd1 = await sr1.json();
         if (Array.isArray(sd1)) semanticMeetings = sd1;
@@ -113,7 +115,7 @@ export default async function handler(req, res) {
       try {
         var sr2 = await fetch(base + "rpc/match_decisions", {
           method: "POST", headers: { ...h, "Content-Type": "application/json" },
-          body: JSON.stringify({ query_embedding: questionEmbedding, match_threshold: 0.25, match_count: 10, filter_board: boardId })
+          body: JSON.stringify({ query_embedding: questionEmbedding, match_threshold: 0.65, match_count: 10, filter_board: boardId })
         });
         var sd2 = await sr2.json();
         if (Array.isArray(sd2)) semanticDecisions = sd2;
@@ -122,7 +124,7 @@ export default async function handler(req, res) {
       try {
         var sr3 = await fetch(base + "rpc/match_legislation", {
           method: "POST", headers: { ...h, "Content-Type": "application/json" },
-          body: JSON.stringify({ query_embedding: questionEmbedding, match_threshold: 0.25, match_count: 5 })
+          body: JSON.stringify({ query_embedding: questionEmbedding, match_threshold: 0.65, match_count: 5 })
         });
         var sd3 = await sr3.json();
         if (Array.isArray(sd3)) semanticLegislation = sd3;
@@ -131,7 +133,7 @@ export default async function handler(req, res) {
       try {
         var sr4 = await fetch(base + "rpc/match_policy_docs", {
           method: "POST", headers: { ...h, "Content-Type": "application/json" },
-          body: JSON.stringify({ query_embedding: questionEmbedding, match_threshold: 0.25, match_count: 5, filter_board: boardId })
+          body: JSON.stringify({ query_embedding: questionEmbedding, match_threshold: 0.65, match_count: 5, filter_board: boardId })
         });
         var sd4 = await sr4.json();
         if (Array.isArray(sd4)) semanticPolicyDocs = sd4;
@@ -271,6 +273,48 @@ export default async function handler(req, res) {
     var answer = "I couldn't generate a response.";
     if (geminiData.candidates && geminiData.candidates[0] && geminiData.candidates[0].content && geminiData.candidates[0].content.parts && geminiData.candidates[0].content.parts[0]) { answer = geminiData.candidates[0].content.parts[0].text; }
 
+    // === QUESTION INTELLIGENCE: Log every question ===
+    var responseTime = Date.now() - startTime;
+    var sourceCounts = {
+      meetings: allMeetings.length, votes: votes.length, decisions: decisions.length,
+      budget: allBudget.length, legislation: allLegislation.length,
+      semantic_meetings: semanticMeetings.length, semantic_decisions: semanticDecisions.length
+    };
+    var hadResults = allMeetings.length > 0 || votes.length > 0 || decisions.length > 0 || allBudget.length > 0;
+    var hadSemantic = semanticMeetings.length > 0 || semanticDecisions.length > 0 || semanticLegislation.length > 0;
+
+    // Simple topic detection from keywords
+    var topicMap = {
+      budget: /budget|fund|revenue|expenditure|deficit|fiscal|financial/i,
+      personnel: /salary|personnel|staff|employee|hire|layoff|union|contract|compensation/i,
+      enrollment: /enrollment|student|ftes|headcount|attendance|registration/i,
+      facilities: /building|campus|construction|master.?plan|bond|measure/i,
+      governance: /board|trustee|vote|policy|resolution|motion|agenda/i,
+      equity: /equity|diversity|inclusion|dei|access|underrepresented/i,
+      safety: /safety|police|security|emergency|threat/i,
+      academics: /program|curriculum|degree|transfer|course|accreditation/i,
+      legislation: /bill|law|legislation|ab\s?\d|sb\s?\d|scff|cola/i
+    };
+    var detectedTopics = [];
+    for (var topic in topicMap) { if (topicMap[topic].test(question)) detectedTopics.push(topic); }
+
+    // Fire-and-forget: don't block response on logging
+    fetch(base + "questions", {
+      method: "POST",
+      headers: { ...h, "Content-Type": "application/json", "Prefer": "return=minimal" },
+      body: JSON.stringify({
+        board_id: boardId,
+        question: question.substring(0, 1000),
+        answer_snippet: answer.substring(0, 500),
+        had_results: hadResults,
+        had_semantic_results: hadSemantic,
+        source_counts: sourceCounts,
+        topic_tags: detectedTopics.length > 0 ? detectedTopics : null,
+        response_time_ms: responseTime,
+        error: false
+      })
+    }).catch(function() {});
+
     return res.status(200).json({
       answer: answer,
       board: boardId,
@@ -289,6 +333,16 @@ export default async function handler(req, res) {
     });
   } catch (err) {
     console.error("MyLocalBoard API error:", err);
+
+    // Log errors too
+    try {
+      fetch(base + "questions", {
+        method: "POST",
+        headers: { ...h, "Content-Type": "application/json", "Prefer": "return=minimal" },
+        body: JSON.stringify({ board_id: boardId, question: question.substring(0, 1000), error: true })
+      }).catch(function() {});
+    } catch(e) {}
+
     return res.status(500).json({ error: "Something went wrong. Please try again." });
   }
 }
