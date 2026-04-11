@@ -365,7 +365,7 @@ export default async function handler(req, res) {
       answer: answer,
       board: boardId,
       sources: {
-        meetings_found: allMeetings.length,
+        meetings_found: allMeetings.length + transcripts.length + semanticChunks.length,
         votes_found: votes.length,
         decisions_found: decisions.length,
         budget_docs_found: allBudget.length,
