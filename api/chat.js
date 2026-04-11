@@ -94,10 +94,11 @@ export default async function handler(req, res) {
       var commonWords = new Set(["board","meeting","meetings","college","santa","monica","trustee","trustees","school","year","years","last","time"]);
       for (var wi = 0; wi < Math.min(words.length, 4); wi++) {
         if (commonWords.has(words[wi])) continue;
+        if (["instances","behavior","behavior","example","regarding","including","related","general","specific","question","answer","issue","issues","concern","concerns","discuss","discussion","information","provide","provided","describe","address"].indexOf(words[wi]) >= 0) continue;
         try {
           var tr = await fetch(base + "rpc/search_transcripts", {
             method: "POST", headers: { ...h, "Content-Type": "application/json" },
-            body: JSON.stringify({ search_term: words[wi], board: boardId, result_limit: 5 })
+            body: JSON.stringify({ search_term: words[wi], board: boardId, result_limit: 3 })
           });
           var td = await tr.json();
           if (Array.isArray(td)) {
