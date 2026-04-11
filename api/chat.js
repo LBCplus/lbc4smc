@@ -98,7 +98,7 @@ export default async function handler(req, res) {
         try {
           var tr = await fetch(base + "rpc/search_transcripts", {
             method: "POST", headers: { ...h, "Content-Type": "application/json" },
-            body: JSON.stringify({ search_term: words[wi], board: boardId, result_limit: 3 })
+            body: JSON.stringify({ search_term: words[wi].substring(0, Math.min(words[wi].length, 8)), board: boardId, result_limit: 3 })
           });
           var td = await tr.json();
           if (Array.isArray(td)) {
