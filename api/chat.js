@@ -225,7 +225,7 @@ export default async function handler(req, res) {
       context += "\n=== MEETING TRANSCRIPTS ===\n";
       for (var i = 0; i < Math.min(transcripts.length, 5); i++) {
         var t = transcripts[i];
-        var snippet = (t.raw_minutes_text || "").substring(0, 500);
+        var fullText = (t.raw_minutes_text || ""); var snippet = ""; var tw = words[0] || ""; var sIdx = fullText.toLowerCase().indexOf(tw.toLowerCase()); if (sIdx > 0) { snippet = fullText.substring(Math.max(0, sIdx - 100), sIdx + 400); } else { snippet = fullText.substring(0, 500); }
         context += "\n" + t.date + " (" + t.meeting_type + "):\n" + snippet + "\n";
       }
     }
@@ -235,7 +235,7 @@ export default async function handler(req, res) {
       context += "\n=== SEMANTIC SEARCH (meaning-based) ===\n";
       if (semanticMeetings.length > 0) {
         context += "\nRelated meeting transcripts:\n";
-        for (var i = 0; i < semanticMeetings.length; i++) { var sm = semanticMeetings[i]; context += sm.date + " (" + sm.meeting_type + ") [" + (sm.similarity * 100).toFixed(0) + "%]: " + (sm.raw_minutes_text || "").substring(0, 400) + "\n"; }
+        for (var i = 0; i < semanticMeetings.length; i++) { var sm = semanticMeetings[i]; var ft = (sm.raw_minutes_text || ""); var sn = ""; for (var wi = 0; wi < Math.min(words.length, 3); wi++) { var si = ft.toLowerCase().indexOf(words[wi]); if (si > 0) { sn = ft.substring(Math.max(0, si - 100), si + 400); break; } } if (!sn) sn = ft.substring(0, 400); context += sm.date + " (" + sm.meeting_type + ") [" + (sm.similarity * 100).toFixed(0) + "%]: " + sn + "\n"; }
       }
       if (semanticDecisions.length > 0) {
         context += "\nRelated decisions:\n";
