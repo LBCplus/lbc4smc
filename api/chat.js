@@ -88,23 +88,29 @@ export default async function handler(req, res) {
     var ccLegislation = await safeFetch(base + "legislation?select=bill_number,session,title,status,signed_date,impact_assessment&is_cc_relevant=eq.true&status=eq.signed&impact_assessment=not.is.null&order=signed_date.desc.nullslast&limit=10");
     var enrollmentData = await safeFetch(base + "enrollment_data?select=academic_year,metric,value,unit,source&order=academic_year.desc&limit=50" + bf);
 
-    // === TRANSCRIPT SEARCH (filtered by board) ===
+    // === TRANSCRIPT SEARCH (RPC with relevant snippets) ===
     var transcripts = [];
     if (words.length > 0) {
-      var searchResults = [];
-      var commonWords = new Set(["board","meeting","meetings","college","santa","monica","trustee","trustees","school","year","years","last","time"]); for (var wi = 0; wi < Math.min(words.length, 4); wi++) { if (commonWords.has(words[wi])) continue;
-        var tw = words[wi].substring(0, 6);
-        if (tw.length < 3) continue;
-        var tr = await safeFetch(base + "meetings?select=date,meeting_type,raw_minutes_text&raw_minutes_text=ilike.*" + encodeURIComponent(tw) + "*&date=gte.2018-01-01&order=date.desc&limit=10" + bf);
-        for (var ti = 0; ti < tr.length; ti++) {
-          var exists = false;
-          for (var si = 0; si < searchResults.length; si++) { if (searchResults[si].date === tr[ti].date) { exists = true; break; } }
-          if (!exists) searchResults.push(tr[ti]);
-        }
+      var commonWords = new Set(["board","meeting","meetings","college","santa","monica","trustee","trustees","school","year","years","last","time"]);
+      for (var wi = 0; wi < Math.min(words.length, 4); wi++) {
+        if (commonWords.has(words[wi])) continue;
+        try {
+          var tr = await fetch(base + "rpc/search_transcripts", {
+            method: "POST", headers: { ...h, "Content-Type": "application/json" },
+            body: JSON.stringify({ search_term: words[wi], board: boardId, result_limit: 5 })
+          });
+          var td = await tr.json();
+          if (Array.isArray(td)) {
+            for (var ti = 0; ti < td.length; ti++) {
+              var exists = false;
+              for (var si = 0; si < transcripts.length; si++) { if (transcripts[si].date === td[ti].date) { exists = true; break; } }
+              if (!exists) transcripts.push(td[ti]);
+            }
+          }
+        } catch(e) {}
       }
-      transcripts = searchResults.slice(0, 10);
+      transcripts = transcripts.slice(0, 10);
     }
-
     // === LAYER 3: SEMANTIC SEARCH (filtered by board) ===
     var semanticMeetings = [];
     var semanticDecisions = [];
@@ -235,7 +241,7 @@ export default async function handler(req, res) {
       context += "\n=== MEETING TRANSCRIPTS ===\n";
       for (var i = 0; i < Math.min(transcripts.length, 5); i++) {
         var t = transcripts[i];
-        var fullText = (t.raw_minutes_text || ""); var snippet = ""; var ftl = fullText.toLowerCase(); for (var wi = 0; wi < words.length; wi++) { var stem = words[wi].substring(0, 6).toLowerCase(); var sIdx = ftl.indexOf(stem); if (sIdx > 0) { snippet = fullText.substring(Math.max(0, sIdx - 150), sIdx + 400); break; } } if (!snippet) snippet = fullText.substring(0, 500);
+        var snippet = t.snippet || (t.raw_minutes_text || "").substring(0, 500);
         context += "\n" + t.date + " (" + t.meeting_type + "):\n" + snippet + "\n";
       }
     }
