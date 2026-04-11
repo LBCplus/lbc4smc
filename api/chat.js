@@ -157,6 +157,17 @@ export default async function handler(req, res) {
       } catch(e) {}
     }
 
+      // Chunk-level semantic search (paragraph-level RAG)
+      var semanticChunks = [];
+      try {
+        var sr5 = await fetch(base + "rpc/match_transcript_chunks", {
+          method: "POST", headers: { ...h, "Content-Type": "application/json" },
+          body: JSON.stringify({ query_embedding: questionEmbedding, match_threshold: 0.3, match_count: 10, filter_board: boardId })
+        });
+        var sd5 = await sr5.json();
+        if (Array.isArray(sd5)) semanticChunks = sd5;
+      } catch(e) {}
+
     // === MERGE AND DEDUPLICATE ===
     var seenDates = {};
     var allMeetings = [];
@@ -177,6 +188,16 @@ export default async function handler(req, res) {
     // === BUILD CONTEXT ===
     var context = boardName.toUpperCase() + " — CIVIC TRANSPARENCY DATA\n";
     context += "Board: " + boardName + " (" + boardCity + ")\n\n";
+
+    // Semantic chunks (HIGHEST PRIORITY — exact paragraphs found by meaning)
+    if (semanticChunks.length > 0) {
+      context += "=== RELEVANT TRANSCRIPT EXCERPTS (found by semantic search) ===\n";
+      for (var i = 0; i < semanticChunks.length; i++) {
+        var sc = semanticChunks[i];
+        context += "\n" + sc.meeting_date + " [" + (sc.similarity * 100).toFixed(0) + "% relevant]:\n" + sc.chunk_text + "\n";
+      }
+      context += "\n";
+    }
 
     // Transcripts (PRIMARY EVIDENCE — placed first)
     if (transcripts.length > 0) {
@@ -353,7 +374,7 @@ export default async function handler(req, res) {
         policy_docs_found: policyDocs.length,
         semantic_meetings: semanticMeetings.length,
         semantic_decisions: semanticDecisions.length,
-        semantic_legislation: semanticLegislation.length, transcripts_found: transcripts.length
+        semantic_legislation: semanticLegislation.length, transcripts_found: transcripts.length, semantic_chunks: semanticChunks.length
       }
     });
   } catch (err) {
