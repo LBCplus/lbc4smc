@@ -177,6 +177,16 @@ export default async function handler(req, res) {
     var context = boardName.toUpperCase() + " — CIVIC TRANSPARENCY DATA\n";
     context += "Board: " + boardName + " (" + boardCity + ")\n\n";
 
+    // Transcripts (PRIMARY EVIDENCE — placed first)
+    if (transcripts.length > 0) {
+      context += "=== MEETING TRANSCRIPTS (actual words spoken at meetings) ===\n";
+      for (var i = 0; i < Math.min(transcripts.length, 10); i++) {
+        var t = transcripts[i];
+        var snippet = t.snippet || (t.raw_minutes_text || "").substring(0, 500);
+        context += "\n" + t.date + " (" + (t.meeting_type || "meeting") + "):\n" + snippet + "\n";
+      }
+    }
+
     // Meetings
     if (allMeetings.length > 0) {
       context += "=== MEETINGS ===\n";
@@ -233,16 +243,6 @@ export default async function handler(req, res) {
         var ptStrs = [];
         for (var i = 0; i < pts.length; i++) { var p = pts[i]; var val = p.unit === "dollars" ? "$" + Number(p.value).toLocaleString() : (p.unit === "percentage" ? p.value + "%" : Number(p.value).toLocaleString()); ptStrs.push(p.academic_year + "=" + val); }
         context += ptStrs.join(", ") + " (Source: " + (byMetric[metric][0].source || "CCCCO") + ")\n";
-      }
-    }
-
-    // Transcripts
-    if (transcripts.length > 0) {
-      context += "\n=== MEETING TRANSCRIPTS ===\n";
-      for (var i = 0; i < Math.min(transcripts.length, 5); i++) {
-        var t = transcripts[i];
-        var snippet = t.snippet || (t.raw_minutes_text || "").substring(0, 500);
-        context += "\n" + t.date + " (" + t.meeting_type + "):\n" + snippet + "\n";
       }
     }
 
