@@ -302,7 +302,27 @@ function Record() {
   const [ref, vis] = useInView();
   const [query, setQuery] = useState("");
   const [answer, setAnswer] = useState(null);
+  const [chartData, setChartData] = useState(null);
+  const chartRef = React.useRef(null);
+  const chartInstance = React.useRef(null);
   const [loading, setLoading] = useState(false);
+
+  React.useEffect(() => {
+    if (!chartData || !chartRef.current) return;
+    if (chartInstance.current) chartInstance.current.destroy();
+    var colors = ["#F7CF3D", "#22D3A7", "#FF6B6B", "#4ECDC4", "#45B7D1"];
+    chartInstance.current = new window.Chart(chartRef.current, {
+      type: chartData.type || "line",
+      data: {
+        labels: chartData.labels,
+        datasets: (chartData.datasets || []).map(function(ds, i) {
+          return { label: ds.label, data: ds.data, borderColor: colors[i % colors.length], backgroundColor: chartData.type === "bar" ? colors[i % colors.length] + "88" : "transparent", tension: 0.3, pointRadius: 4, pointBackgroundColor: colors[i % colors.length] };
+        })
+      },
+      options: { responsive: true, plugins: { legend: { labels: { color: "#FAF7F2" } } }, scales: { x: { ticks: { color: "rgba(250,247,242,0.6)" }, grid: { color: "rgba(250,247,242,0.1)" } }, y: { ticks: { color: "rgba(250,247,242,0.6)" }, grid: { color: "rgba(250,247,242,0.1)" } } } }
+    });
+    return () => { if (chartInstance.current) chartInstance.current.destroy(); };
+  }, [chartData]);
   const [sources, setSources] = useState(null);
   const [history, setHistory] = useState([]);
 
@@ -311,7 +331,7 @@ function Record() {
     const q = query.trim();
     setQuery("");
     setLoading(true);
-    setAnswer(null);
+    setAnswer(null); setChartData(null);
     setSources(null);
 
     try {
@@ -324,7 +344,7 @@ function Record() {
       if (data.error) {
         setAnswer("Sorry, I couldn't process that question. Please try again.");
       } else {
-        setAnswer(data.answer);
+        setAnswer(data.answer); setChartData(data.chart || null);
         setSources(data.sources);
         setHistory(prev => [...prev, { q, a: data.answer, s: data.sources }]);
       }
@@ -448,6 +468,14 @@ function Record() {
                     Sources: {sources.meetings_found} meetings, {sources.votes_found} votes, {sources.decisions_found} decisions searched
                   </div>
                 )}
+              </div>
+            )}
+
+            {/* Chart */}
+            {chartData && !loading && (
+              <div style={{ padding: "24px", background: "rgba(250,247,242,0.06)", borderRadius: 8, marginBottom: 16, border: "1px solid rgba(250,247,242,0.1)" }}>
+                <div style={{ color: "#F7CF3D", fontSize: 14, fontWeight: 600, marginBottom: 12, fontFamily: "'Source Sans 3', sans-serif" }}>{chartData.title}</div>
+                <canvas ref={chartRef} style={{ maxHeight: 300 }} />
               </div>
             )}
 

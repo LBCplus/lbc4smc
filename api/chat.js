@@ -361,8 +361,42 @@ export default async function handler(req, res) {
       })
     }).catch(function() {});
 
+
+    // === CHART GENERATION (deterministic from Supabase data, not LLM) ===
+    var chart = null;
+    var qLower = question.toLowerCase();
+    var isBudgetQ = /budget|revenue|expenditure|deficit|personnel|cost|fund balance|financial/.test(qLower);
+    var isEnrollmentQ = /enrollment|ftes|student|headcount|attendance/.test(qLower);
+    if (isBudgetQ && allBudget.length >= 2) {
+      var sorted = allBudget.slice().sort(function(a,b) { return a.fiscal_year.localeCompare(b.fiscal_year); });
+      var labels = []; var revenue = []; var expenditures = []; var personnel_pct = []; var fund_bal = [];
+      for (var i = 0; i < sorted.length; i++) {
+        var b = sorted[i];
+        labels.push(b.fiscal_year);
+        if (b.total_revenue) revenue.push(b.total_revenue);
+        if (b.total_expenditures) expenditures.push(b.total_expenditures);
+        if (b.personnel_cost_percentage) personnel_pct.push(b.personnel_cost_percentage);
+        if (b.fund_balance) fund_bal.push(b.fund_balance);
+      }
+      if (/personnel|cost/.test(qLower) && personnel_pct.length >= 2) {
+        chart = { type: "line", title: "Personnel Cost % of Budget", labels: labels, datasets: [{ label: "Personnel %", data: personnel_pct }] };
+      } else if (/fund.?balance|reserve/.test(qLower) && fund_bal.length >= 2) {
+        chart = { type: "line", title: "Fund Balance", labels: labels, datasets: [{ label: "Fund Balance ($)", data: fund_bal }] };
+      } else if (/deficit/.test(qLower) && revenue.length >= 2) {
+        var deficits = []; for (var i = 0; i < Math.min(revenue.length, expenditures.length); i++) { deficits.push(revenue[i] - expenditures[i]); }
+        chart = { type: "bar", title: "Revenue vs Expenditures", labels: labels.slice(0, revenue.length), datasets: [{ label: "Revenue", data: revenue }, { label: "Expenditures", data: expenditures }] };
+      } else if (revenue.length >= 2) {
+        chart = { type: "line", title: "Budget Overview", labels: labels.slice(0, revenue.length), datasets: [{ label: "Revenue", data: revenue }, { label: "Expenditures", data: expenditures }] };
+      }
+    }
+    if (isEnrollmentQ && enrollmentData.length >= 2) {
+      var ftesData = enrollmentData.filter(function(e) { return e.metric && e.metric.toLowerCase().indexOf("ftes") >= 0; }).sort(function(a,b) { return a.academic_year.localeCompare(b.academic_year); });
+      if (ftesData.length >= 2) {
+        chart = { type: "line", title: "Enrollment (FTES)", labels: ftesData.map(function(e) { return e.academic_year; }), datasets: [{ label: "FTES", data: ftesData.map(function(e) { return e.value; }) }] };
+      }
+    }
     return res.status(200).json({
-      answer: answer,
+      answer: answer, chart: chart,
       board: boardId,
       sources: {
         meetings_found: allMeetings.length + transcripts.length + semanticChunks.length,
