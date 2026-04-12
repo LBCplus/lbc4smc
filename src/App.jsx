@@ -303,11 +303,11 @@ function Record() {
   const [query, setQuery] = useState("");
   const [answer, setAnswer] = useState(null);
   const [chartData, setChartData] = useState(null);
-  const chartRef = React.useRef(null);
-  const chartInstance = React.useRef(null);
+  const chartRef = useRef(null);
+  const chartInstance = useRef(null);
   const [loading, setLoading] = useState(false);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!chartData || !chartRef.current) return;
     if (chartInstance.current) chartInstance.current.destroy();
     var colors = ["#F7CF3D", "#22D3A7", "#FF6B6B", "#4ECDC4", "#45B7D1"];
