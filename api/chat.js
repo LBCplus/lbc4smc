@@ -174,6 +174,26 @@ export default async function handler(req, res) {
         if (Array.isArray(sd5)) semanticChunks = sd5;
       } catch(e) {}
 
+      // Name-based chunk search (find chunks containing proper nouns)
+      var nameMatch = question.match(/[A-Z][a-z]{2,}(?:[- ][A-Z][a-z]+)*/g);
+      var nameChunks = [];
+      if (nameMatch) {
+        var skipNames = new Set(["Santa","Monica","College","Board","Trustees","California","What","How","When","Where","Why","Does","Did","Are","Were","The","This","That","Include","Trustee","April","May","June","July","August","September","October","November","December","January","February","March"]);
+        for (var ni = 0; ni < nameMatch.length; ni++) {
+          if (skipNames.has(nameMatch[ni])) continue;
+          try {
+            var dateQ = dateFrom ? "&meeting_date=gte." + dateFrom : "";
+            if (dateTo) dateQ += "&meeting_date=lte." + dateTo;
+            var nc = await safeFetch(base + "transcript_chunks?select=meeting_date,chunk_text&chunk_text=ilike.*" + encodeURIComponent(nameMatch[ni]) + "*&board_id=eq." + boardId + dateQ + "&order=meeting_date.desc&limit=10");
+            for (var ci = 0; ci < nc.length; ci++) {
+              var dup = false;
+              for (var si = 0; si < nameChunks.length; si++) { if (nameChunks[si].chunk_text === nc[ci].chunk_text) { dup = true; break; } }
+              if (!dup) nameChunks.push(nc[ci]);
+            }
+          } catch(e) {}
+        }
+      }
+
     // === MERGE AND DEDUPLICATE ===
     var seenDates = {};
     var allMeetings = [];
@@ -201,6 +221,16 @@ export default async function handler(req, res) {
       for (var i = 0; i < semanticChunks.length; i++) {
         var sc = semanticChunks[i];
         context += "\n" + sc.meeting_date + " [" + (sc.similarity * 100).toFixed(0) + "% relevant]:\n" + sc.chunk_text + "\n";
+      }
+      context += "\n";
+    }
+
+    // Name-matched chunks (specific person mentioned in question)
+    if (nameChunks.length > 0) {
+      context += "=== TRANSCRIPT EXCERPTS MENTIONING NAMED PERSON ===\n";
+      for (var i = 0; i < Math.min(nameChunks.length, 10); i++) {
+        var nc = nameChunks[i];
+        context += "\n" + nc.meeting_date + ":\n" + nc.chunk_text + "\n";
       }
       context += "\n";
     }
@@ -414,7 +444,7 @@ export default async function handler(req, res) {
         policy_docs_found: policyDocs.length,
         semantic_meetings: semanticMeetings.length,
         semantic_decisions: semanticDecisions.length,
-        semantic_legislation: semanticLegislation.length, transcripts_found: transcripts.length, semantic_chunks: semanticChunks.length
+        semantic_legislation: semanticLegislation.length, transcripts_found: transcripts.length, semantic_chunks: semanticChunks.length, name_chunks: nameChunks.length
       }
     });
   } catch (err) {
