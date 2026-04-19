@@ -54,6 +54,12 @@ export default async function handler(req, res) {
 
     const stop = new Set(["the","a","an","and","or","but","in","on","at","to","for","of","with","by","from","is","was","are","were","been","has","have","had","do","does","did","will","would","could","should","may","might","can","how","what","when","where","who","which","that","this","these","those","about","most","recent","last","latest","first","all","any","each","every","many","much","some","more","other","into"]);
     const words = question.toLowerCase().split(/\s+/).filter(function(w) { return w.length > 2 && !stop.has(w); });
+
+    // Date detection for filtering
+    var dateFrom = null; var dateTo = null;
+    var ym = question.match(/b(january|february|march|april|may|june|july|august|september|october|november|december)s+(20d{2})b/i);
+    if (ym) { var months = {january:"01",february:"02",march:"03",april:"04",may:"05",june:"06",july:"07",august:"08",september:"09",october:"10",november:"11",december:"12"}; var mn = months[ym[1].toLowerCase()]; dateFrom = ym[2] + "-" + mn + "-01"; dateTo = ym[2] + "-" + mn + "-28"; }
+    if (!ym) { var yOnly = question.match(/b(20d{2})b/); if (yOnly) { dateFrom = yOnly[1] + "-01-01"; dateTo = yOnly[1] + "-12-31"; } }
     const sq = words.join("+");
 
     // === LEVEL 1 DATA SOURCES (filtered by board) ===
@@ -162,7 +168,7 @@ export default async function handler(req, res) {
       try {
         var sr5 = await fetch(base + "rpc/match_transcript_chunks", {
           method: "POST", headers: { ...h, "Content-Type": "application/json" },
-          body: JSON.stringify({ query_embedding: questionEmbedding, match_threshold: 0.3, match_count: 10, filter_board: boardId })
+          body: JSON.stringify({ query_embedding: questionEmbedding, match_threshold: 0.3, match_count: 10, filter_board: boardId, filter_date_from: dateFrom, filter_date_to: dateTo })
         });
         var sd5 = await sr5.json();
         if (Array.isArray(sd5)) semanticChunks = sd5;
