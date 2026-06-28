@@ -830,7 +830,7 @@ function Join() {
           resident — your voice matters.
         </p>
 
-        {/* Donate Button - Coming Soon */}
+        {/* Donate Button */}
         <div style={{
           background: "#003A75", borderRadius: 10, padding: "32px",
           marginBottom: 40, opacity: vis ? 1 : 0,
@@ -845,17 +845,33 @@ function Join() {
             fontFamily: "'Source Sans 3', sans-serif", fontSize: 15,
             color: "rgba(250,247,242,0.6)", marginBottom: 20, lineHeight: 1.5
           }}>
-            Donations will be accepted through ActBlue once campaign paperwork is filed with the State of California.
+            Every contribution helps us reach more voters and make the case for transparent, student-centered governance at SMC.
           </p>
-          <div style={{
-            display: "inline-block", padding: "14px 36px", borderRadius: 8,
-            background: "rgba(247,207,61,0.15)", border: "2px solid rgba(247,207,61,0.3)",
-            fontFamily: "'Source Sans 3', sans-serif", fontSize: 15,
-            fontWeight: 700, color: "#F7CF3D", letterSpacing: "0.04em",
-            textTransform: "uppercase"
-          }}>
-            Donate — Coming Soon
-          </div>
+          <a
+            href="https://www.efundraisingconnections.com/c/Castanoncollegeboard2026"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              display: "inline-block", padding: "14px 36px", borderRadius: 8,
+              background: "#F7CF3D", border: "2px solid #F7CF3D",
+              fontFamily: "'Source Sans 3', sans-serif", fontSize: 15,
+              fontWeight: 700, color: "#003A75", letterSpacing: "0.04em",
+              textTransform: "uppercase", textDecoration: "none",
+              transition: "all 0.2s ease", cursor: "pointer"
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = "#FFD94D";
+              e.currentTarget.style.borderColor = "#FFD94D";
+              e.currentTarget.style.transform = "translateY(-1px)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = "#F7CF3D";
+              e.currentTarget.style.borderColor = "#F7CF3D";
+              e.currentTarget.style.transform = "translateY(0)";
+            }}
+          >
+            Donate Now
+          </a>
         </div>
 
         {/* Signup Form */}
@@ -979,7 +995,7 @@ function Footer() {
           </div>
         </div>
         <div className="footer-legal">
-          Paid for by Luis Barrera Castañón for SMC Board of Trustees 2026 (pending campaign filing).<br />
+          Paid for by Luis Barrera Castanon for SMC College Board 2026. FPPC ID #1492219.<br />
           Transparency powered by <span style={{ color: "rgba(247, 207, 61, 0.5)" }}>MyLocalBoard</span>, an open-source civic transparency platform. © 2026
         </div>
       </div>
